@@ -1,14 +1,18 @@
 <h2>Your Tasks</h2>
 
+<!-- Task Creation Form -->
 <div>
   <input [(ngModel)]="newTask.title" placeholder="Title">
   <input [(ngModel)]="newTask.description" placeholder="Description">
+  <input [(ngModel)]="newTask.dueDate" type="date" placeholder="Due Date">
   <button (click)="createTask()">Add</button>
 </div>
 
+<!-- Task List -->
 <ul>
   <li *ngFor="let task of tasks">
-    {{ task.title }} - {{ task.description }}
+    <strong>{{ task.title }}</strong> - {{ task.description }} - 
+    <em>Due: {{ task.dueDate | date: 'mediumDate' }}</em>
     <button (click)="deleteTask(task.id!)">Delete</button>
   </li>
 </ul>
