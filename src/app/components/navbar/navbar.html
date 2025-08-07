@@ -2,12 +2,11 @@
   <div class="navbar-left">
     <a routerLink="/">TO DO APP</a>
   </div>
-  <div class="navbar-center">
-    <a *ngIf="!isLoggedIn" routerLink="/login">Login</a>
-    <a *ngIf="!isLoggedIn" routerLink="/register">Register</a>
-    <a *ngIf="isLoggedIn" routerLink="/dashboard">Dashboard</a>
-  </div>
   <div class="navbar-right">
-    <button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+    <a *ngIf="!authService.isLoggedIn()" routerLink="/register">Register</a>
+    <a *ngIf="!authService.isLoggedIn()" routerLink="/login">Login</a>
+
+    <a *ngIf="authService.isLoggedIn()" routerLink="/dashboard">Dashboard</a>
+    <a *ngIf="authService.isLoggedIn()" (click)="logout()">Logout</a>
   </div>
 </nav>

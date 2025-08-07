@@ -1,37 +1,48 @@
+// src/app/services/auth.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs'; // ✅ Fix: Missing import
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
-  private baseUrl = 'http://localhost:5003/api/auth'; // your backend
+   private baseUrl = 'http://localhost:5003/api/auth'; // your backend
 
-  public user: any = null; // ✅ Fix: Declare `user`
+  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private http: HttpClient) {}
 
-  login(data: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, data, {
-      withCredentials: true, // ✅ For cookie auth
-    }).pipe(
-      tap((res: any) => this.user = res.user) // ✅ Fix: import `tap`
+  private hasToken(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  isLoggedIn(): Observable<boolean> {
+    return this.loggedIn.asObservable();
+  }
+
+  register(user: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/register`, user);
+  }
+
+  login(user: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/login`, user).pipe(
+      tap((res: any) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          this.loggedIn.next(true);
+        }
+      })
     );
   }
 
-  register(data: { username: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/signup`, data, {
-      withCredentials: true,
-    });
+  logout(): void {
+    localStorage.removeItem('token');
+    this.loggedIn.next(false);
   }
 
-  logout(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/logout`, {}, {
-      withCredentials: true,
-    });
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
-
-  isLoggedIn(): boolean {
-  return !!localStorage.getItem('token');
-  }
-
 }

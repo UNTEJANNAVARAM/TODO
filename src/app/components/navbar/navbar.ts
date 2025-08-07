@@ -11,16 +11,9 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './navbar.css'
 })
 export class NavbarComponent {
-  isLoggedIn = signal(false);
-
-  constructor(private authService: AuthService, private router: Router) {
-    effect(() => {
-      this.isLoggedIn.set(this.authService.isLoggedIn());
-    });
-  }
+  constructor(public authService: AuthService, private router: Router) {}
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

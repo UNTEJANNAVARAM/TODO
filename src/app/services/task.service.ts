@@ -1,27 +1,46 @@
+// src/app/services/task.service.ts
+
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Task } from '../models/task.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class TaskService {
-  private baseUrl = 'https://todo-list-backend-sk9a.onrender.com/api/tasks';
+  private baseUrl = 'https://localhost:5003/api/tasks';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.baseUrl);
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
   }
 
-  createTask(task: Task): Observable<Task> {
-    return this.http.post<Task>(this.baseUrl, task);
+  getTasks(): Observable<any> {
+    return this.http.get(this.baseUrl, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  updateTask(taskId: number, task: Task): Observable<Task> {
-    return this.http.put<Task>(`${this.baseUrl}/${taskId}`, task);
+  createTask(task: any): Observable<any> {
+    return this.http.post(this.baseUrl, task, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
-  deleteTask(taskId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${taskId}`);
+  updateTask(id: number, task: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${id}`, task, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  deleteTask(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }
