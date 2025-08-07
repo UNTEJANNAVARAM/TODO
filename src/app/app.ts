@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+// app/app.component.ts
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './components/navbar/navbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [RouterOutlet, NavbarComponent],
+  template: `
+    <app-navbar></app-navbar>
+    <div class="container mt-4">
+      <router-outlet></router-outlet>
+    </div>
+  `
 })
-export class App {
-  protected readonly title = signal('todo-front10');
-}
+export class AppComponent {}

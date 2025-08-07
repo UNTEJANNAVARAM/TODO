@@ -1,0 +1,9 @@
+<form>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <input [(ngModel)]="username" placeholder="Username" name="username">
+  <input [(ngModel)]="email" placeholder="Email" type="email" name="email">
+  <input [(ngModel)]="password" placeholder="Password" type="password" name="password">
+
+  <button (click)="register()">Register</button>
+</form>
