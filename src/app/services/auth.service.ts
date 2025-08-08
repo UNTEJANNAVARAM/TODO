@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-   private baseUrl = 'http://localhost:5003/api/auth'; // your backend
+   private apiUrl = 'http://localhost:5003/api/auth'; // your backend
 
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
 
@@ -22,26 +22,18 @@ export class AuthService {
     return this.loggedIn.asObservable();
   }
 
-  register(user: any): Observable<any> {
-  return this.http.post(`${this.baseUrl}/signup`, user); // <-- updated to match backend
+ login(credentials: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true });
 }
 
+register(data: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/register`, data, { withCredentials: true });
+}
 
-  login(user: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, user).pipe(
-      tap((res: any) => {
-        if (res.token) {
-          localStorage.setItem('token', res.token);
-          this.loggedIn.next(true);
-        }
-      })
-    );
-  }
+logout(): Observable<any> {
+  return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
+}
 
-  logout(): void {
-    localStorage.removeItem('token');
-    this.loggedIn.next(false);
-  }
 
   getToken(): string | null {
     return localStorage.getItem('token');

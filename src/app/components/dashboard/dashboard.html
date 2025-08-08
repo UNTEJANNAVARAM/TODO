@@ -8,11 +8,28 @@
   <button (click)="createTask()">Add</button>
 </div>
 
+<hr>
+
 <!-- Task List -->
 <ul>
   <li *ngFor="let task of tasks">
-    <strong>{{ task.title }}</strong> - {{ task.description }} - 
-    <em>Due: {{ task.dueDate | date: 'mediumDate' }}</em>
-    <button (click)="deleteTask(task.id!)">Delete</button>
+    
+    <!-- If the task is being edited -->
+    <div *ngIf="editTaskId === task.id; else viewMode">
+      <input [(ngModel)]="editTask.title" placeholder="Title">
+      <input [(ngModel)]="editTask.description" placeholder="Description">
+      <input [(ngModel)]="editTask.dueDate" type="date" placeholder="Due Date">
+      <button (click)="updateTask(task.id!)">Save</button>
+      <button (click)="cancelEdit()">Cancel</button>
+    </div>
+
+    <!-- Normal view -->
+    <ng-template #viewMode>
+      <strong>{{ task.title }}</strong> - {{ task.description }} - 
+      <em>Due: {{ task.dueDate | date: 'mediumDate' }}</em>
+      <button (click)="startEdit(task)">Update</button>
+      <button (click)="deleteTask(task.id!)">Delete</button>
+    </ng-template>
+    
   </li>
 </ul>
