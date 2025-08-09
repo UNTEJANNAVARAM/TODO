@@ -27,7 +27,7 @@ export class AuthService {
 }
 
 register(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/register`, data, { withCredentials: true });
+  return this.http.post(`${this.apiUrl}/signup`, data, { withCredentials: true });
 }
 
 logout(): Observable<any> {
