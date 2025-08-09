@@ -1,75 +1,76 @@
 :host {
-  display: block;
-  padding: 2rem;
-  background-color: #f1f2f6;
-  min-height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #2d3436;
-}
-
-.task-form {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
   justify-content: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f8fafc 80%, #e6ecfa 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.task-form input {
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  flex: 1;
-  min-width: 200px;
+/* Main Dashboard Card */
+.dashboard-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 32px #d7eaf360;
+  width: 100%;
+  max-width: 1100px;
 }
 
-.task-form button {
-  background-color: #00b894;
-  color: white;
-  padding: 0.6rem 1.2rem;
+/* Title */
+.dashboard-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3967ff;
+  margin-bottom: 1.5rem;
+}
+
+/* Table Styling */
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-table th {
+  background: #ecf2ff;
+  color: #3967ff;
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid #d7eaf3;
+}
+
+.task-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e7eaf3;
+  color: #333;
+}
+
+/* Alternate row shading */
+.task-table tr:nth-child(even) td {
+  background: #f9fbff;
+}
+
+/* Buttons */
+.action-btn {
+  background: #3967ff;
+  color: #fff;
   border: none;
-  border-radius: 5px;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: background 0.2s;
 }
 
-.task-form button:hover {
-  background-color: #55efc4;
+.action-btn:hover {
+  background: #6789ee;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-  max-width: 600px;
-  margin: 0 auto;
+.delete-btn {
+  background: #d63031;
 }
 
-li {
-  background: white;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-li button {
-  background-color: #d63031;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-li button:hover {
-  background-color: #ff7675;
+.delete-btn:hover {
+  background: #ff4c4c;
 }

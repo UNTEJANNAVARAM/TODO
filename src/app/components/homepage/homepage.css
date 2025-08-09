@@ -1,0 +1,107 @@
+:host {
+  display: block;
+  background: linear-gradient(135deg, #f8fafc 80%, #e6ecfa 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #333;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e7eaf3;
+  padding: 1rem 2.8rem;
+  box-shadow: 0 2px 8px #e7eaf392;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3967ff;
+  letter-spacing: 1px;
+}
+
+/* Login/Register Buttons */
+.button-group {
+  display: flex;
+  gap: 1.2rem;
+}
+.button-group button {
+  background-color: #3967ff;
+  color: white;
+  border: none;
+  padding: 0.52rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 7px;
+  font-weight: 500;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px #d7e3ff40;
+  cursor: pointer;
+}
+.button-group button:hover {
+  background: #6789ee;
+  box-shadow: 0 6px 20px #c8dfff80;
+}
+
+/* BODY */
+.body-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.4rem;
+}
+
+/* Main heading and intro */
+.intro {
+  text-align: center;
+  margin-bottom: 2.3rem;
+}
+.intro h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #2657c2;
+  margin-bottom: 1.2rem;
+  letter-spacing: 1px;
+}
+.intro p {
+  font-size: 1.18rem;
+  color: #444;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 3.5rem;
+  text-align: center;
+  padding: 1.5rem 0 1.2rem 0;
+  background: linear-gradient(90deg, #324e85 66%, #506da2 100%);
+  color: #ebf2fc;            /* light text for contrast */
+  border-top: 1px solid #457bd9; /* slightly deeper blue for border */
+  font-size: 1.07rem;
+  box-shadow: 0 -2px 18px #324e8555;
+  letter-spacing: 0.05em;
+}
+
+
+@media (max-width: 700px) {
+  .info-box-group {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+  .info-box {
+    min-width: 190px;
+    max-width: 90vw;
+  }
+  .intro h1 { font-size: 2rem; }
+}
+
+/* Optional: Nice focus state for buttons for accessibility */
+.button-group button:focus-visible {
+  outline: 2px solid #3967ff;
+  background: #6789ee;
+}

@@ -2,40 +2,26 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-   private apiUrl = 'http://localhost:5003/api/auth'; // your backend
-
-  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+  private apiUrl = 'http://localhost:5003/api/auth'; // Your backend root
 
   constructor(private http: HttpClient) {}
 
-  private hasToken(): boolean {
-    return !!localStorage.getItem('token');
+  login(credentials: { email: string, password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true });
   }
 
-  isLoggedIn(): Observable<boolean> {
-    return this.loggedIn.asObservable();
+  register(data: { username: string, email: string, password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/signup`, data, { withCredentials: true });
   }
 
- login(credentials: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true });
-}
-
-register(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/signup`, data, { withCredentials: true });
-}
-
-logout(): Observable<any> {
-  return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
-}
-
-
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  // Add logout and others as needed...
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true });
   }
 }

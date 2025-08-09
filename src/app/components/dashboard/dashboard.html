@@ -1,35 +1,118 @@
-<h2>Your Tasks</h2>
+<div class="dashboard-container">
 
-<!-- Task Creation Form -->
-<div>
-  <input [(ngModel)]="newTask.title" placeholder="Title">
-  <input [(ngModel)]="newTask.description" placeholder="Description">
-  <input [(ngModel)]="newTask.dueDate" type="date" placeholder="Due Date">
-  <button (click)="createTask()">Add</button>
+  <!-- Logout button at top right -->
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 1.4rem;">
+    <button class="action-btn logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <h2>Your Tasks</h2>
+
+  <!-- Create New Task Form -->
+  <form class="task-form" (ngSubmit)="createTask()" style="margin-bottom:2rem;">
+    <input
+      type="text"
+      [(ngModel)]="newTask.title"
+      name="title"
+      placeholder="Title"
+      required
+      [ngModelOptions]="{standalone: true}"
+    >
+    <input
+      type="text"
+      [(ngModel)]="newTask.description"
+      name="description"
+      placeholder="Description"
+      required
+      [ngModelOptions]="{standalone: true}"
+    >
+    <input
+      type="datetime-local"
+      [(ngModel)]="newTask.dueDate"
+      name="dueDate"
+      required
+      [ngModelOptions]="{standalone: true}"
+      placeholder="Due Date & Time"
+    >
+    <button type="submit" class="action-btn">Add Task</button>
+  </form>
+
+  <!-- TASKS TABLE -->
+  <table class="task-table" *ngIf="tasks.length > 0; else noTask">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Due Date</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of tasks">
+        <!-- Edit Mode -->
+        <ng-container *ngIf="editTaskId === task.id; else viewRow">
+          <td>
+            <input
+              type="text"
+              [(ngModel)]="editTask.title"
+              name="editTitle{{task.id}}"
+              required
+              [ngModelOptions]="{standalone:true}">
+          </td>
+          <td>
+            <input
+              type="text"
+              [(ngModel)]="editTask.description"
+              name="editDesc{{task.id}}"
+              required
+              [ngModelOptions]="{standalone:true}">
+          </td>
+          <td>
+            <input
+              type="text"
+              [(ngModel)]="editTask.status"
+              name="editStatus{{task.id}}"
+              placeholder="Status"
+              [ngModelOptions]="{standalone:true}">
+          </td>
+          <td>
+            <input
+              type="datetime-local"
+              [(ngModel)]="editTask.dueDate"
+              name="editDueDate{{task.id}}"
+              required
+              [ngModelOptions]="{standalone:true}">
+          </td>
+          <td>
+            <span>{{task.createdAt | date:'short'}}</span>
+          </td>
+          <td>
+            <span>{{task.updatedAt | date:'short'}}</span>
+          </td>
+          <td>
+            <button class="action-btn" type="button" (click)="updateTask(task.id)">Save</button>
+            <button class="action-btn" type="button" (click)="cancelEdit()">Cancel</button>
+          </td>
+        </ng-container>
+        <!-- View Mode -->
+        <ng-template #viewRow>
+          <td>{{ task.title }}</td>
+          <td>{{ task.description }}</td>
+          <td>{{ task.status || '—' }}</td>
+          <td>{{ task.dueDate ? (task.dueDate | date:'short') : '—' }}</td>
+          <td>{{ task.createdAt | date:'short' }}</td>
+          <td>{{ task.updatedAt | date:'short' }}</td>
+          <td>
+            <button class="action-btn" type="button" (click)="startEdit(task)">Edit</button>
+            <button class="action-btn delete-btn" type="button" (click)="deleteTask(task.id!)">Delete</button>
+          </td>
+        </ng-template>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noTask>
+    <p style="text-align:center;color:#777;padding:1.8rem 0;">No tasks found. Use the form above to add one!</p>
+  </ng-template>
 </div>
-
-<hr>
-
-<!-- Task List -->
-<ul>
-  <li *ngFor="let task of tasks">
-    
-    <!-- If the task is being edited -->
-    <div *ngIf="editTaskId === task.id; else viewMode">
-      <input [(ngModel)]="editTask.title" placeholder="Title">
-      <input [(ngModel)]="editTask.description" placeholder="Description">
-      <input [(ngModel)]="editTask.dueDate" type="date" placeholder="Due Date">
-      <button (click)="updateTask(task.id!)">Save</button>
-      <button (click)="cancelEdit()">Cancel</button>
-    </div>
-
-    <!-- Normal view -->
-    <ng-template #viewMode>
-      <strong>{{ task.title }}</strong> - {{ task.description }} - 
-      <em>Due: {{ task.dueDate | date: 'mediumDate' }}</em>
-      <button (click)="startEdit(task)">Update</button>
-      <button (click)="deleteTask(task.id!)">Delete</button>
-    </ng-template>
-    
-  </li>
-</ul>

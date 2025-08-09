@@ -1,63 +1,162 @@
-/* Center the form on the screen */
 :host {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 80%, #e6ecfa 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-form, div {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  min-width: 300px;
+/* Centered card container */
+.login-container {
+  background: #fff;
+  padding: 2rem 2rem 1.2rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 32px #d7eaf360;
+  min-width: 320px;
   width: 100%;
-  max-width: 400px;
+  max-width: 390px;
 }
 
-/* Style input fields */
-input {
-  width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-/* Style the button */
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* Style the error message */
-.error {
-  color: red;
-  font-weight: bold;
-  font-size: 14px;
-  background-color: #ffe6e6;
-  border: 1px solid #ff4d4d;
-  padding: 8px 12px;
+/* Heading */
+h2 {
   text-align: center;
-  margin: 10px auto;
-  border-radius: 5px;
-  width: fit-content;
-  max-width: 90%;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3967ff;
+  margin-bottom: 1.1rem;
+}
+
+/* FORM */
+form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* Uniform input and button size */
+input,
+button[type="submit"] {
+  width: 100%;
   box-sizing: border-box;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  border-radius: 7px;
+}
+
+input {
+  border: 1px solid #e7eaf3;
+  background: #ecf2ff;
+  color: #333;
+  transition: border-color 0.2s;
+  margin-bottom: 0; /* Prevent extra space */
+}
+
+input:focus {
+  border-color: #3967ff;
+  outline: none;
+}
+
+button[type="submit"] {
+  background: #3967ff;
+  color: white;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 8px #d7eaf340;
+  margin-top: 0; /* Prevent offset */
+}
+
+button[type="submit"]:hover,
+button[type="submit"]:focus-visible {
+  background: #6789ee;
+}
+
+/* Error message styling */
+.error {
+  color: #d63031;
+  background: #fae3e5;
+  border: 1px solid #ff7675;
+  padding: 0.7rem 1rem;
+  border-radius: 7px;
+  margin: 0.8rem 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Register link section at the bottom */
+.register-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.register-link button {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.7rem 1rem;
+  background: #32a8ff;
+  color: #fff;
+  border-radius: 7px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+  margin-top: 0.2rem;
+}
+
+.register-link button:hover,
+.register-link button:focus-visible {
+  background: #4460b5;
+}
+
+@media (max-width: 500px) {
+  .login-container {
+    padding: 1.3rem 0.3rem;
+    min-width: 0;
+    max-width: 97vw;
+    border-radius: 13px;
+  }
+  h2 { font-size: 1.25rem; }
+}
+
+.back-btn-container {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  z-index: 100;
+}
+
+.back-btn {
+  background: #f3f7ff;
+  color: #3967ff;
+  border: 1.5px solid #a5bfef;
+  border-radius: 25px;
+  padding: 0.42rem 1.3rem;
+  font-size: 1.03rem;
+  font-weight: 500;
+  box-shadow: 0 1px 4px #d6e2ff39;
+  cursor: pointer;
+  transition: background 0.17s, color 0.17s, border 0.18s;
+}
+
+.back-btn:hover,
+.back-btn:focus-visible {
+  background: #3967ff;
+  color: #fff;
+  border-color: #3967ff;
+}
+
+/* To prevent overlapping form on mobile: */
+@media (max-width: 600px) {
+  .back-btn-container {
+    top: 10px;
+    right: 8px;
+  }
 }

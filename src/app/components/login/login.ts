@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
   email = '';
@@ -19,12 +19,28 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   login(): void {
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
-      error: (err) => {
-        console.error(err);
-        this.errorMessage = err.error?.message || 'Login failed';
-      },
-    });
+  this.errorMessage = '';
+  if (!this.email || !this.password) {
+    this.errorMessage = 'Please enter email and password.';
+    return;
+  }
+  this.authService.login({ email: this.email, password: this.password }).subscribe({
+    next: () => this.router.navigate(['/dashboard']),
+    error: (err) => {
+      if (err.status === 401) this.errorMessage = 'Invalid credentials.';
+      else if (err.status === 404) this.errorMessage = 'User not found.';
+      else if (err.status === 0) this.errorMessage = 'Cannot reach server.';
+      else this.errorMessage = err.error?.error || 'Login failed.';
+    }
+  });
+}
+
+
+
+  goToHome() {
+    this.router.navigate(['/']);
+  }
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 }
