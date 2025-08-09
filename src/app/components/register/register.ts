@@ -68,6 +68,10 @@ export class RegisterComponent {
         }, 1500);
       },
       error: (err) => {
+        if (err.status === 0) {
+         // This means network error such as backend not reachable
+         this.error = 'Cannot reach server. Please check your network or backend server status.';
+        }
         if (err.status === 409) {
           this.error = 'User already exists, please login or use another email.';
         } else if (err.status === 400 && err.error?.error) {

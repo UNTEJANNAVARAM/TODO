@@ -7,7 +7,7 @@ import { Task } from '../models/task.model';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = 'http://localhost:5003/api/tasks'; // ✅ correct protocol & URL
+  private apiUrl = 'https://todo-list-backend-sk9a.onrender.com/api/tasks'; // ✅ correct protocol & URL
 
   constructor(private http: HttpClient) {}
 

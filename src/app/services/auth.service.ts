@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5003/api/auth'; // Your backend root
+  private apiUrl = 'https://todo-list-backend-sk9a.onrender.com/api/auth';// ✅ Your backend root
 
   constructor(private http: HttpClient) {}
 

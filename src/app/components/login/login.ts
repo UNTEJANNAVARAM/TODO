@@ -25,14 +25,20 @@ export class LoginComponent {
     return;
   }
   this.authService.login({ email: this.email, password: this.password }).subscribe({
-    next: () => this.router.navigate(['/dashboard']),
-    error: (err) => {
-      if (err.status === 401) this.errorMessage = 'Invalid credentials.';
-      else if (err.status === 404) this.errorMessage = 'User not found.';
-      else if (err.status === 0) this.errorMessage = 'Cannot reach server.';
-      else this.errorMessage = err.error?.error || 'Login failed.';
+  next: () => this.router.navigate(['/dashboard']),
+  error: (err) => {
+    if (err.status === 0) {
+      this.errorMessage = 'Cannot reach server. Please check your network or backend server status.';
+    } else if (err.status === 401) {
+      this.errorMessage = 'Invalid credentials.';
+    } else if (err.status === 404) {
+      this.errorMessage = 'User not found.';
+    } else {
+      this.errorMessage = err.error?.message || 'Login failed.';
     }
-  });
+  }
+});
+
 }
 
 

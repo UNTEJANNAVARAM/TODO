@@ -1,14 +1,19 @@
 <div class="dashboard-container">
 
-  <!-- Logout button at top right -->
-  <div style="display: flex; justify-content: flex-end; margin-bottom: 1.4rem;">
+  <!-- Top bar for Logout button -->
+  <div class="dashboard-header">
     <button class="action-btn logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <!-- QUOTE BANNER (centered, scrolls on set) -->
+  <div *ngIf="quoteMessage" id="quoteBanner" class="quote-banner">
+    {{ quoteMessage }}
   </div>
 
   <h2>Your Tasks</h2>
 
-  <!-- Create New Task Form -->
-  <form class="task-form" (ngSubmit)="createTask()" style="margin-bottom:2rem;">
+  <!-- Task Add Form -->
+  <form class="task-form" (ngSubmit)="createTask()">
     <input
       type="text"
       [(ngModel)]="newTask.title"
@@ -36,7 +41,7 @@
     <button type="submit" class="action-btn">Add Task</button>
   </form>
 
-  <!-- TASKS TABLE -->
+  <!-- Tasks Table -->
   <table class="task-table" *ngIf="tasks.length > 0; else noTask">
     <thead>
       <tr>
@@ -51,8 +56,8 @@
     </thead>
     <tbody>
       <tr *ngFor="let task of tasks">
-        <!-- Edit Mode -->
-        <ng-container *ngIf="editTaskId === task.id; else viewRow">
+        <!-- Edit mode -->
+        <ng-container *ngIf="editTaskId === task.id; else viewMode">
           <td>
             <input
               type="text"
@@ -70,12 +75,10 @@
               [ngModelOptions]="{standalone:true}">
           </td>
           <td>
-            <input
-              type="text"
-              [(ngModel)]="editTask.status"
-              name="editStatus{{task.id}}"
-              placeholder="Status"
-              [ngModelOptions]="{standalone:true}">
+            <select [(ngModel)]="editTask.status" name="editStatus{{task.id}}" [ngModelOptions]="{standalone:true}">
+              <option [ngValue]="false">Pending</option>
+              <option [ngValue]="true">Done</option>
+            </select>
           </td>
           <td>
             <input
@@ -85,34 +88,36 @@
               required
               [ngModelOptions]="{standalone:true}">
           </td>
+          <td>{{ task.createdAt | date:'short' }}</td>
+          <td>{{ task.updatedAt | date:'short' }}</td>
           <td>
-            <span>{{task.createdAt | date:'short'}}</span>
-          </td>
-          <td>
-            <span>{{task.updatedAt | date:'short'}}</span>
-          </td>
-          <td>
-            <button class="action-btn" type="button" (click)="updateTask(task.id)">Save</button>
-            <button class="action-btn" type="button" (click)="cancelEdit()">Cancel</button>
+            <div class="task-action-group">
+              <button class="action-btn" type="button" (click)="updateTask(task)">Save</button>
+              <button class="action-btn" type="button" (click)="cancelEdit()">Cancel</button>
+            </div>
           </td>
         </ng-container>
-        <!-- View Mode -->
-        <ng-template #viewRow>
+
+        <!-- View mode -->
+        <ng-template #viewMode>
           <td>{{ task.title }}</td>
           <td>{{ task.description }}</td>
-          <td>{{ task.status || '—' }}</td>
+          <td>{{ task.status ? 'Done ✅' : 'Pending ⏳' }}</td>
           <td>{{ task.dueDate ? (task.dueDate | date:'short') : '—' }}</td>
           <td>{{ task.createdAt | date:'short' }}</td>
           <td>{{ task.updatedAt | date:'short' }}</td>
           <td>
-            <button class="action-btn" type="button" (click)="startEdit(task)">Edit</button>
-            <button class="action-btn delete-btn" type="button" (click)="deleteTask(task.id!)">Delete</button>
+            <div class="task-action-group">
+              <button class="action-btn" *ngIf="!task.status" (click)="startEdit(task)">Edit</button>
+              <button class="action-btn delete-btn" (click)="deleteTask(task.id!)">Delete</button>
+            </div>
           </td>
         </ng-template>
       </tr>
     </tbody>
   </table>
+
   <ng-template #noTask>
-    <p style="text-align:center;color:#777;padding:1.8rem 0;">No tasks found. Use the form above to add one!</p>
+    <p class="no-task-text">No tasks. Add one above to get started!</p>
   </ng-template>
 </div>

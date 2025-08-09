@@ -17,19 +17,20 @@ import { Task } from '../../models/task.model';
 export class DashboardComponent implements OnInit {
   tasks: Task[] = [];
 
+  quoteMessage: string = '';
+
   newTask: Partial<Task> = {
     title: '',
     description: '',
-    status: '',
+    status: false,
     dueDate: ''
   };
 
-  // Editing state
   editTaskId: number | null = null;
   editTask: Partial<Task> = {
     title: '',
     description: '',
-    status: '',
+    status: false,
     dueDate: ''
   };
 
@@ -43,7 +44,6 @@ export class DashboardComponent implements OnInit {
     this.getTasks();
   }
 
-  // Fetch tasks from backend
   getTasks() {
     this.taskService.getTasks().subscribe({
       next: (res) => (this.tasks = res),
@@ -51,23 +51,22 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Create a new task
   createTask() {
     if (!this.newTask.title || !this.newTask.description || !this.newTask.dueDate) {
       alert('Please fill all fields');
       return;
     }
-
+    this.newTask.status = false;
     this.taskService.addTask(this.newTask as Task).subscribe({
       next: (res) => {
         this.tasks.push(res);
-        this.newTask = { title: '', description: '', status: '', dueDate: '' };
+        this.newTask = { title: '', description: '', status: false, dueDate: '' };
+        this.showQuote("Let's get chasing your work 🚀");
       },
       error: (err) => console.error('Error creating task:', err)
     });
   }
 
-  // Start editing a task
   startEdit(task: Task) {
     this.editTaskId = task.id!;
     this.editTask = {
@@ -78,19 +77,32 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  // Cancel edit
   cancelEdit() {
     this.editTaskId = null;
-    this.editTask = { title: '', description: '', status: '', dueDate: '' };
+    this.editTask = { title: '', description: '', status: false, dueDate: '' };
   }
 
-  // Update an existing task
-  updateTask(taskId: number) {
+  updateTask(task: Task) {
+    const taskId = task.id!;
+    const originalTask = this.tasks.find(t => t.id === taskId);
+    const beforeStatus = originalTask?.status;
+    const beforeDue = originalTask?.dueDate;
+
     this.taskService.updateTask(taskId, this.editTask as Task).subscribe({
       next: (updated) => {
         const index = this.tasks.findIndex(t => t.id === taskId);
         if (index > -1) {
           this.tasks[index] = updated;
+        }
+        // QUOTE logic
+        if (this.editTask.status === true && beforeStatus !== true) {
+          this.showQuote("Cheers up! 🎉 Task completed.");
+        } else if (
+          beforeDue &&
+          this.editTask.dueDate &&
+          new Date(this.editTask.dueDate) > new Date(beforeDue)
+        ) {
+          this.showQuote("Taking extra time is fine! Keep going ⏳");
         }
         this.cancelEdit();
       },
@@ -98,7 +110,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Delete a task
   deleteTask(id: number) {
     this.taskService.deleteTask(id).subscribe({
       next: () => {
@@ -108,14 +119,24 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // LOGOUT FUNCTION: Calls backend to clear cookie, then navigates to login page
+  // Show quote for 3 seconds and scroll into view
+  private showQuote(message: string) {
+    this.quoteMessage = message;
+    setTimeout(() => (this.quoteMessage = ''), 3000);
+    setTimeout(() => {
+      const el = document.getElementById('quoteBanner');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 10); // Short delay to allow rendering
+  }
+
   logout() {
     this.authService.logout().subscribe({
       next: () => {
         this.router.navigate(['/login']);
       },
       error: () => {
-        // If error, still redirect
         this.router.navigate(['/login']);
       }
     });
