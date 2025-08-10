@@ -34,10 +34,11 @@ export class LoginComponent {
     } else if (err.status === 404) {
       this.errorMessage = 'User not found.';
     } else {
-      this.errorMessage = err.error?.message || 'Login failed.';
+      this.errorMessage = (err.error && err.error.message) ? err.error.message : 'Login failed.';
     }
   }
 });
+
 
 }
 
