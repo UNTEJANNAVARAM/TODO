@@ -1,123 +1,134 @@
-<div class="dashboard-container">
+<div class="dashboard-layout4">
 
-  <!-- Top bar for Logout button -->
-  <div class="dashboard-header">
-    <button class="action-btn logout-btn" (click)="logout()">Logout</button>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="profile-card">
+      <h3>Wlcome back, {{user.displayName}}</h3>
+    </div>
+
+    <button class="calendar-toggle-btn" (click)="toggleCalendar()">
+      {{ calendarVisible ? 'Hide Calendar' : 'Show Calendar' }}
+    </button>
+
+    <div *ngIf="calendarVisible" class="calendar-container">
+      <div class="calendar-nav">
+        <button (click)="prevMonth()">&laquo; Prev</button>
+        <span>{{ currentMonthName }} {{ currentYear }}</span>
+        <button (click)="nextMonth()">Next &raquo;</button>
+      </div>
+      <table class="calendar">
+        <thead>
+          <tr><th *ngFor="let day of weekDays">{{ day }}</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let week of calendarWeeks">
+            <td *ngFor="let dateObj of week"
+                [ngClass]="getDateClass(dateObj)"
+                (click)="selectDate(dateObj)">
+              {{ dateObj.date }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 
-  <!-- QUOTE BANNER (centered, scrolls on set) -->
-  <div *ngIf="quoteMessage" id="quoteBanner" class="quote-banner">
-    {{ quoteMessage }}
+  <!-- MAINLEFT -->
+  <div class="mainleft">
+    <input type="text"
+           [(ngModel)]="searchTerm"
+           class="search-bar"
+           placeholder="Search tasks..."
+           (input)="applySearchFilter()" />
+
+    <div *ngFor="let task of filteredTasks"
+         class="task-card"
+         [ngClass]="{
+           'green-top': task.status,
+           'orange-top': isDueWithinTwoDays(task.dueDate, task.status),
+           'red-top': isOverdue(task.dueDate, task.status)
+         }"
+         (click)="showTaskDetails(task)">
+      <div class="task-header">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-status">{{ task.status ? '✅ Done' : '⏳ Pending' }}</div>
+        <div class="task-duedate">Due: {{ task.dueDate | date:'mediumDate' }}</div>
+      </div>
+    </div>
   </div>
 
-  <h2>Your Tasks</h2>
+  <!-- MAINRIGHT -->
+  <div class="mainright">
 
-  <!-- Task Add Form -->
-  <form class="task-form" (ngSubmit)="createTask()">
-    <input
-      type="text"
-      [(ngModel)]="newTask.title"
-      name="title"
-      placeholder="Title"
-      required
-      [ngModelOptions]="{standalone: true}"
-    >
-    <input
-      type="text"
-      [(ngModel)]="newTask.description"
-      name="description"
-      placeholder="Description"
-      required
-      [ngModelOptions]="{standalone: true}"
-    >
-    <input
-      type="datetime-local"
-      [(ngModel)]="newTask.dueDate"
-      name="dueDate"
-      required
-      [ngModelOptions]="{standalone: true}"
-      placeholder="Due Date & Time"
-    >
-    <button type="submit" class="action-btn">Add Task</button>
-  </form>
+    <!-- Add Task Button -->
+    <button class="add-task-btn main-btn" (click)="showAddTaskFormToggle()">
+      + Add Task
+    </button>
 
-  <!-- Tasks Table -->
-  <table class="task-table" *ngIf="tasks.length > 0; else noTask">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Status</th>
-        <th>Due Date</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let task of tasks">
-        <!-- Edit mode -->
-        <ng-container *ngIf="editTaskId === task.id; else viewMode">
-          <td>
-            <input
-              type="text"
-              [(ngModel)]="editTask.title"
-              name="editTitle{{task.id}}"
-              required
-              [ngModelOptions]="{standalone:true}">
-          </td>
-          <td>
-            <input
-              type="text"
-              [(ngModel)]="editTask.description"
-              name="editDesc{{task.id}}"
-              required
-              [ngModelOptions]="{standalone:true}">
-          </td>
-          <td>
-            <select [(ngModel)]="editTask.status" name="editStatus{{task.id}}" [ngModelOptions]="{standalone:true}">
-              <option [ngValue]="false">Pending</option>
-              <option [ngValue]="true">Done</option>
-            </select>
-          </td>
-          <td>
-            <input
-              type="datetime-local"
-              [(ngModel)]="editTask.dueDate"
-              name="editDueDate{{task.id}}"
-              required
-              [ngModelOptions]="{standalone:true}">
-          </td>
-          <td>{{ task.createdAt | date:'short' }}</td>
-          <td>{{ task.updatedAt | date:'short' }}</td>
-          <td>
-            <div class="task-action-group">
-              <button class="action-btn" type="button" (click)="updateTask(task)">Save</button>
-              <button class="action-btn" type="button" (click)="cancelEdit()">Cancel</button>
-            </div>
-          </td>
-        </ng-container>
+    <!-- Add Task Form -->
+    <div *ngIf="showAddTaskForm" class="add-task-form">
+      <div *ngIf="createError" class="error-msg">{{ createError }}</div>
+      <input type="text" [(ngModel)]="newTask.title" placeholder="Title" />
+      <textarea [(ngModel)]="newTask.description" placeholder="Description"></textarea>
+      <input type="date" [(ngModel)]="newTask.dueDate" />
+      <button class="main-btn" (click)="createTask()">Create</button>
+    </div>
 
-        <!-- View mode -->
-        <ng-template #viewMode>
-          <td>{{ task.title }}</td>
-          <td>{{ task.description }}</td>
-          <td>{{ task.status ? 'Done ✅' : 'Pending ⏳' }}</td>
-          <td>{{ task.dueDate ? (task.dueDate | date:'short') : '—' }}</td>
-          <td>{{ task.createdAt | date:'short' }}</td>
-          <td>{{ task.updatedAt | date:'short' }}</td>
-          <td>
-            <div class="task-action-group">
-              <button class="action-btn" *ngIf="!task.status" (click)="startEdit(task)">Edit</button>
-              <button class="action-btn delete-btn" (click)="deleteTask(task.id!)">Delete</button>
-            </div>
-          </td>
-        </ng-template>
-      </tr>
-    </tbody>
-  </table>
+    <!-- Task Details -->
+    <div *ngIf="selectedTask && !showAddTaskForm" class="task-details-pane">
+      <h2 class="detail-title">{{ selectedTask.title }}</h2>
 
-  <ng-template #noTask>
-    <p class="no-task-text">No tasks. Add one above to get started!</p>
-  </ng-template>
+      <div class="dates-status-row">
+        <div><strong>Status:</strong> {{ selectedTask.status ? 'Completed' : 'Pending' }}</div>
+        <div><strong>Created:</strong> {{ selectedTask.createdAt | date:'short' }}</div>
+        <div><strong>Updated:</strong> {{ selectedTask.updatedAt | date:'short' }}</div>
+        <div><strong>Due:</strong> {{ selectedTask.dueDate | date:'mediumDate' }}</div>
+      </div>
+
+      <div class="task-description">
+        <strong>Description:</strong>
+        <p>{{ selectedTask.description }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons" *ngIf="!editMode">
+        <button class="main-btn" (click)="startEdit(selectedTask)">Edit</button>
+        <button class="delete-btn" (click)="deleteTask(selectedTask.id!)">Delete</button>
+        <button class="complete-btn" (click)="toggleComplete(selectedTask)">
+          {{ selectedTask.status ? 'Mark Uncomplete' : 'Mark Complete' }}
+        </button>
+      </div>
+
+      <!-- Edit Form -->
+      <div *ngIf="editMode" class="edit-form">
+        <div *ngIf="editError" class="error-msg">{{ editError }}</div>
+        <input type="text" [(ngModel)]="editTaskData.title" placeholder="Title" />
+        <textarea [(ngModel)]="editTaskData.description" placeholder="Description"></textarea>
+        <input type="date" [(ngModel)]="editTaskData.dueDate" />
+        <div class="form-actions">
+          <button class="main-btn" (click)="saveEdit()">Save</button>
+          <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summarybox">
+    <div class="current-datetime">
+      {{ currentDate | date:'EEEE, MMMM d, y - hh:mm a' }}
+    </div>
+    <div class="task-summary-box white-bg">
+      <h3>Task Summary</h3>
+      <div class="summary-line green-line">Completed: {{ completedPercent }}% ({{ completedCount }} tasks)</div>
+      <div class="summary-line orange-line">Ongoing: {{ ongoingPercent }}% ({{ ongoingCount }} tasks)</div>
+      <div class="summary-line red-line">Out of Date: {{ overduePercent }}% ({{ overdueCount }} tasks)</div>
+    </div>
+    <div class="streak-box">
+      <h4>Streak</h4>
+      <div class="streak-star">&#11088;<span class="streak-number"><b>{{ streakCount }}</b></span></div>
+    </div>
+  </div>
 </div>
