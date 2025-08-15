@@ -9,7 +9,7 @@
 
 <!-- ===== SIDEBAR ===== -->
 <div class="sidebar" [class.open]="sidebarOpen">
-  <div class="username">Hi, {{ user.displayName }}</div>
+  <div class="username">{{ user.displayName }}</div>
   <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToProfile()">Profile</button>
   <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToCalendar()">Calendar</button>
   <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToDashboard()">Dashboard</button>
@@ -113,10 +113,11 @@
     <div class="error-message" *ngIf="editError">{{ editError }}</div>
     <div class="form-actions">
       <button class="dashboard-btn-base dashboard-btn-blue" (click)="saveEdit()">Save</button>
-      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelEdit()">Cancel</button>
+      <button class="dashboard-btn-base dashboard-btn-orange" (click)="cancelEdit()">Cancel</button>
     </div>
   </div>
-
+  <div *ngIf="showToast" class="toast-message">
+  {{ toastMessage }}
 </div>
 
 </div>

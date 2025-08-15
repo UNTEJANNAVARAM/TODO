@@ -222,7 +222,15 @@ export class CalendarComponent implements OnInit {
     const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
     return !done && date.getTime() < Date.now();
   }
-
+    toastMessage: string = '';
+showToast: boolean = false;
+showPopup(message: string) {
+  this.toastMessage = message;
+  this.showToast = true;
+  setTimeout(() => {
+    this.showToast = false;
+  }, 5000); // Show for 5 seconds
+}
   /** CRUD Ops */
   startEdit(task: Task) {
     this.editingTask = { ...task };
@@ -263,6 +271,7 @@ export class CalendarComponent implements OnInit {
         this.editError = 'Failed to update task.';
       }
     });
+    this.showPopup('✏️ Task updated! Keep moving forward.');
   }
 
   cancelEdit() {
@@ -275,6 +284,7 @@ export class CalendarComponent implements OnInit {
       this.tasks = this.tasks.filter(t => t.id !== id);
       this.filterTasksByDate(this.selectedDate);
     });
+    this.showPopup('🗑️ Task deleted. Stay focused!');
   }
 
   toggleComplete(task: Task) {
@@ -289,6 +299,12 @@ export class CalendarComponent implements OnInit {
       const idx = this.tasks.findIndex(t => t.id === updated.id);
       if (idx > -1) this.tasks[idx] = updated;
       this.filterTasksByDate(this.selectedDate);
+      if (updated.status) {
+      this.showPopup('✅ Task marked complete! Great job!');
+    } else {
+      this.showPopup('🔄 Task marked incomplete. Keep going!');
+    }
     });
+    
   }
 }

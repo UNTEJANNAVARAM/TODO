@@ -76,6 +76,8 @@ export class ProfileComponent implements OnInit {
       this.router.navigate(['/login']);
     });
   }
+  globalErrorMessage: string = '';
+  formErrorMessage: string = ''; // For update/edit form errors
 
   // Load profile from local storage or API
   loadUserProfile() {
@@ -109,16 +111,16 @@ export class ProfileComponent implements OnInit {
   }
 
   saveEdit() {
-    this.errorMessage = '';
+    this.formErrorMessage = '';
     if (!this.editData.username || !this.editData.email) {
-      this.errorMessage = 'Username and Email are required';
+      this.formErrorMessage  = 'Username and Email are required';
       return;
     }
 
     // Basic email validation
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(this.editData.email)) {
-      this.errorMessage = 'Invalid email format. Example: user@example.com';
+      this.formErrorMessage  = 'Invalid email format. Example: user@example.com';
       return;
     }
 
@@ -126,13 +128,13 @@ export class ProfileComponent implements OnInit {
       next: updatedUser => {
         this.user = updatedUser;
         this.editMode = false;
-        this.errorMessage = '';
+        this.formErrorMessage  = '';
       },
       error: err => {
         if (err.status === 409 || err.error?.message?.toLowerCase().includes('email')) {
-          this.errorMessage = 'Email is already in use.';
+          this.formErrorMessage  = 'Email is already in use.';
         } else {
-          this.errorMessage = 'Failed to update account.';
+          this.formErrorMessage  = 'Failed to update account.';
         }
       }
     });
@@ -155,18 +157,18 @@ export class ProfileComponent implements OnInit {
   }
 
   updatePassword() {
-    this.errorMessage = '';
+    this.formErrorMessage = '';
     if (!this.passwordData.currentPassword || !this.passwordData.newPassword || !this.passwordData.confirmPassword) {
-      this.errorMessage = 'All password fields are required';
+      this.formErrorMessage = 'All password fields are required';
       return;
     }
     if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
-      this.errorMessage = 'New password and confirm password do not match';
+      this.formErrorMessage = 'New password and confirm password do not match';
       return;
     }
     const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     if (!strongPasswordPattern.test(this.passwordData.newPassword)) {
-      this.errorMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.';
+      this.formErrorMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.';
       return;
     }
 
@@ -174,28 +176,38 @@ export class ProfileComponent implements OnInit {
       next: () => {
         alert('Password updated successfully');
         this.showPasswordForm = false;
-        this.errorMessage = '';
+        this.formErrorMessage = '';
       },
       error: err => {
         if (err.status === 400 || err.error?.message?.toLowerCase().includes('current password')) {
-          this.errorMessage = 'Current password is incorrect.';
+          this.formErrorMessage = 'Current password is incorrect.';
         } else {
-          this.errorMessage = 'Failed to update password.';
+          this.formErrorMessage = 'Failed to update password.';
         }
       }
     });
   }
 
-  deleteAccount() {
-    if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-      this.authService.deleteAccount().subscribe({
-        next: () => {
-          this.authService.logout().subscribe(() => {
-            this.router.navigate(['/']);
-          });
-        },
-        error: () => this.errorMessage = 'Account deletion failed.'
+  showDeleteConfirm = false;
+
+deleteAccount() {
+  this.showDeleteConfirm = true; // Show the modal popup instead of browser confirm
+}
+
+confirmDeleteAccount() {
+  this.authService.deleteAccount().subscribe({
+    next: () => {
+      this.authService.logout().subscribe(() => {
+        this.router.navigate(['/']);
       });
-    }
-  }
+    },
+    error: () => this.errorMessage = 'Account deletion failed.'
+  });
+  this.showDeleteConfirm = false;
+}
+
+cancelDeleteAccount() {
+  this.showDeleteConfirm = false;
+}
+
 }

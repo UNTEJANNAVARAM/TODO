@@ -95,15 +95,16 @@ form {
 
 /* Error + Success Messages */
 .error {
-  background: #fdecea;
-  border: 1px solid #f5c2c7;
-  color: #b71c1c;
+  background: #fdecea; /* light red bg */
+  border: 1px solid #f5c2c7; /* red border */
+  color: #b71c1c; /* dark red text */
   padding: 0.6rem 0.8rem;
   border-radius: 4px;
-  margin-top: 0.5rem;
+  margin-top: 0.7rem;
   font-size: 0.85rem;
   text-align: center;
 }
+
 .success {
   background: #37d67a;
   color: #fff;

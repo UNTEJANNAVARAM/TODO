@@ -155,7 +155,15 @@ applySearchFilter() {
       this.newTask = { title: '', description: '', status: false, dueDate: '' };
     }
   }
-
+  toastMessage: string = '';
+showToast: boolean = false;
+showPopup(message: string) {
+  this.toastMessage = message;
+  this.showToast = true;
+  setTimeout(() => {
+    this.showToast = false;
+  }, 5000); // Show for 5 seconds
+}
   createTask() {
     this.createError = '';
     if (!this.newTask.title || !this.newTask.description || !this.newTask.dueDate) {
@@ -184,6 +192,7 @@ applySearchFilter() {
       this.calculateTaskSummary();
       this.calculateStreak();
     });
+    this.showPopup('🎉 Great job! Task added.');
   }
 
   showTaskDetails(task: Task) {
@@ -207,33 +216,45 @@ applySearchFilter() {
       this.editTaskData.dueDate = `${year}-${month}-${day}T${hours}:${minutes}`;
     }
   }
+  originalDueDate: string | Date = '';
+  
 
-  saveEdit() {
-    this.editError = '';
-    if (!this.editTaskData.title || !this.editTaskData.description || !this.editTaskData.dueDate) {
-      this.editError = 'All fields are required.';
-      return;
-    }
-    const due = new Date(this.editTaskData.dueDate as string);
-    const now = new Date();
-
-    // 3. Ensure due date is in the future
-    if (due.getTime() <= now.getTime()) {
-      this.editError = 'Due date and time must be in the future.';
-      return;
-    }
-    this.editTaskData.updatedAt = new Date().toISOString();
-
-    this.taskService.updateTask(this.editTaskData.id!, this.editTaskData).subscribe(updated => {
-      const idx = this.tasks.findIndex(t => t.id === updated.id);
-      if (idx > -1) this.tasks[idx] = updated;
-      this.applySearchFilter();
-      this.selectedTask = updated;
-      this.editMode = false;
-      this.calculateTaskSummary();
-      this.calculateStreak();
-    });
+ saveEdit() {
+  this.editError = '';
+  if (!this.editTaskData.title || !this.editTaskData.description || !this.editTaskData.dueDate) {
+    this.editError = 'All fields are required.';
+    return;
   }
+  const due = new Date(this.editTaskData.dueDate as string);
+  const now = new Date();
+  if (due.getTime() <= now.getTime()) {
+    this.editError = 'Due date and time must be in the future.';
+    return;
+  }
+  this.editTaskData.updatedAt = new Date().toISOString();
+
+  // Do comparison BEFORE the API call
+  const oldDueDate = new Date(this.originalDueDate);
+  const newDueDate = new Date(this.editTaskData.dueDate);
+
+  this.taskService.updateTask(this.editTaskData.id!, this.editTaskData).subscribe(updated => {
+    const idx = this.tasks.findIndex(t => t.id === updated.id);
+    if (idx > -1) this.tasks[idx] = updated;
+    this.applySearchFilter();
+    this.selectedTask = updated;
+    this.editMode = false;
+    this.calculateTaskSummary();
+    this.calculateStreak();
+
+    // Show toast INSIDE subscribe, using stored comparison
+    if (newDueDate > oldDueDate) {
+      this.showPopup('⏳ Due date extended. Use it wisely!');
+    } else {
+      this.showPopup('✏️ Task updated! Keep moving forward.');
+    }
+  });
+}
+
 
   cancelEdit() {
     this.editMode = false;
@@ -248,6 +269,7 @@ applySearchFilter() {
       this.calculateTaskSummary();
       this.calculateStreak();
     });
+    this.showPopup('🗑️ Task deleted. Stay focused!');
   }
 
   toggleComplete(task: Task) {
@@ -270,6 +292,7 @@ applySearchFilter() {
         streakChange = dayDiff;
       }
     }
+    this.showPopup('✅ Task completed! Well done.');
   } else {
     // Marking task INCOMPLETE: decrease streak based on previous completion streak for this task
 
@@ -284,12 +307,14 @@ applySearchFilter() {
       const completedMid = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
 
       const dayDiff = Math.floor((dueMid.getTime() - completedMid.getTime()) / (1000 * 60 * 60 * 24));
-
+    
       // Only decrease if completed early
       if (dayDiff > 0) {
         streakChange = -dayDiff;
       }
     }
+    
+    this.showPopup('🔄 Task marked incomplete. Keep it up!');
   }
 
   const updatedTask: Task = {
@@ -306,11 +331,15 @@ applySearchFilter() {
 
     this.applySearchFilter();
     this.selectedTask = updated;
+    this.calculateTaskSummary();
+      this.calculateStreak();
 
     // Update streak count adding or subtracting streakChange
     this.streakCount = Math.max(0, this.streakCount + streakChange);
   });
 }
+
+
 
 
   calculateTaskSummary() {

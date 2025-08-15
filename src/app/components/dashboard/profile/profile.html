@@ -9,7 +9,7 @@
 
 <!-- SIDEBAR -->
 <div class="sidebar" [class.open]="sidebarOpen">
-  <div class="username">Hi, {{ user?.displayName || 'User' }}</div>
+  <div class="username">{{ user?.displayName || 'User' }}</div>
   <button (click)="goToProfile()">Profile</button>
   <button (click)="goToDashboard()">Dashboard</button>
   <button (click)="goToCalendar()">Calendar</button>
@@ -20,7 +20,9 @@
 <div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
 
 <!-- MAIN PROFILE SECTION -->
+<div *ngIf="errorMessage" class="global-error-message">{{ errorMessage }}</div>
 <div class="profile-container">
+  
   <!-- View Mode -->
   <div *ngIf="!editMode && !showPasswordForm && user" class="profile-box">
     <p><strong>User ID:</strong> {{ user.id }}</p>
@@ -30,7 +32,7 @@
     <p><strong>Account Updated:</strong> {{ user.updatedAt | date:'fullDate' }} {{ user.updatedAt | date:'HH:mm' }}</p>-->
 
     <div class="form-actions">
-      <button class="dashboard-btn-base dashboard-btn-blue" (click)="startEdit()">Update Account</button>
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="startEdit()">Update User Details</button>
       <button class="dashboard-btn-base dashboard-btn-orange" (click)="startPasswordUpdate()">Update Password</button>
       <button class="dashboard-btn-base dashboard-btn-red" (click)="deleteAccount()">Delete Account</button>
     </div>
@@ -42,10 +44,12 @@
     <input type="email" [(ngModel)]="editData.email" placeholder="Email" />
     <div class="form-actions">
       <button class="dashboard-btn-base dashboard-btn-blue" (click)="saveEdit()">Save</button>
-      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelEdit()">Cancel</button>
+      <button class="dashboard-btn-base dashboard-btn-orange" (click)="cancelEdit()">Cancel</button>
     </div>
-    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="error-message" *ngIf="formErrorMessage ">{{ formErrorMessage  }}</div>
   </div>
+  
+
 
   <!-- Update Password Form -->
   <div *ngIf="showPasswordForm" class="edit-form">
@@ -54,8 +58,21 @@
     <input type="password" [(ngModel)]="passwordData.confirmPassword" placeholder="Confirm Password" />
     <div class="form-actions">
       <button class="dashboard-btn-base dashboard-btn-blue" (click)="updatePassword()">Save</button>
-      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelPasswordUpdate()">Cancel</button>
+      <button class="dashboard-btn-base dashboard-btn-orange" (click)="cancelPasswordUpdate()">Cancel</button>
     </div>
-    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="error-message" *ngIf="formErrorMessage">{{ formErrorMessage }}</div>
   </div>
+
+   <!-- Delete Account Confirmation Modal -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirm"></div>
+<div class="modal" *ngIf="showDeleteConfirm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <h2 id="modalTitle">Confirm Account Deletion</h2>
+  <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+  <div class="form-actions">
+    <button class="dashboard-btn-base dashboard-btn-red" (click)="confirmDeleteAccount()">Yes, Delete</button>
+    <button class="dashboard-btn-base dashboard-btn-orange" (click)="cancelDeleteAccount()">Cancel</button>
+  </div>
+  <div class="error-message" *ngIf="globalErrorMessage">{{ globalErrorMessage }}</div>
+</div>
+
 </div>

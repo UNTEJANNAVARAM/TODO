@@ -1,11 +1,11 @@
 /* === GLOBAL FONT === */
+/* Base font & color */
 .profile-container,
 .profile-container * {
   font-family: 'Segoe UI', Arial, sans-serif;
   font-size: 0.95rem;
   color: #333;
 }
-
 /* === HEADER === */
 .app-header {
   display: flex;
@@ -137,24 +137,27 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 2rem;
-  padding-left: 20px; /* space for sidebar */
+  padding: 1rem 2rem 2rem 20px; /* Reduced top padding from 2rem to 1rem */
+  padding-left: 20px; /* Keep space for sidebar */
   box-sizing: border-box;
   min-height: 100vh;
 }
 
-.profile-box {
+
+.profile-box, 
+.edit-form {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1.5rem;
+  padding: 2rem 2rem 1.2rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   width: 100%;
-  max-width: 500px;
+  max-width: 390px;
+  border: 1px solid #ddd;
   text-align: center;
 }
 
 .profile-box p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 /* BUTTONS (reuse dashboard styles) */
@@ -163,37 +166,28 @@
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
   font-weight: 500;
-  border: none;
   border-radius: 3px;
   cursor: pointer;
+  border: none;
   height: auto;
   line-height: 1.2;
   box-sizing: border-box;
 }
 
 .dashboard-btn-blue {
-  background: #e3f2fd;
-  color: #0d47a1;
+      /* same as .blue-line */
+  background: #1565c0;
 }
-
 .dashboard-btn-green {
-  background: #e0f2e9;
-  color: #2e7d32;
+  background:     /* same as .green-line */
+  #2e7d32;
 }
-
 .dashboard-btn-red {
-  background: #fdecea;
-  color: #c62828;
+  background: #c62828;
 }
-
-.dashboard-btn-grey {
-  background: #eeeeee;
-  color: #424242;
-}
-
 .dashboard-btn-orange {
-  background: #fff3e0;
-  color: #ef6c00;
+  background:   /* same as .orange-line */
+  #ef6c00;
 }
 
 .dashboard-btn-blue:hover {
@@ -213,26 +207,19 @@
 }
 
 /* FORM STYLES */
-.edit-form {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 500px;
-  margin-top: 1rem;
-}
 
 .edit-form input {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
   width: 100%;
   padding: 0.6rem;
   border-radius: 4px;
   border: 1px solid #ddd;
+  box-sizing: border-box;
 }
 
 .edit-form input:focus {
   border-color: #3967ff;
+  outline: none;
 }
 
 /* BUTTON SPACING */
@@ -251,6 +238,60 @@
   color: #b71c1c; /* dark red text */
   padding: 0.6rem 0.8rem;
   border-radius: 4px;
-  margin-top: 0.5rem;
+  margin-top: 0.7rem;
   font-size: 0.85rem;
+  text-align: center;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.3);
+  z-index: 2000;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-radius: 6px;
+  z-index: 2100;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #c62828;
+}
+
+.modal p {
+  margin-bottom: 1.5rem;
+}
+
+.modal .form-actions button {
+  min-width: 120px;
+}
+
+.global-error-message {
+  background: #fdecea; /* light red bg */
+  border: 1px solid #f5c2c7; /* red border */
+  color: #b71c1c; /* dark red text */
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  text-align: center;
+  max-width: 390;
+  justify-content: center;
+  display: flex;
 }

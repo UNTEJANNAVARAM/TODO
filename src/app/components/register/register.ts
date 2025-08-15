@@ -74,9 +74,11 @@ export class RegisterComponent {
         }
         if (err.status === 409) {
           this.error = 'User already exists, please login or use another email.';
-        } else if (err.status === 400 && err.error?.error) {
+        } 
+        else if (err.status === 400 && err.error?.error) {
           this.error = err.error.error;
-        } else {
+        }  
+        else {
           this.error = err.error?.message || 'Registration failed. Please try again.';
         }
       }
