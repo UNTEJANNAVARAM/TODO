@@ -39,6 +39,23 @@ export class AuthService {
     localStorage.removeItem('user');
     return this.http.post<any>(`${this.apiUrl}/logout`, {}, { withCredentials: true });
   }
+  
+  getProfile(): Observable<any> {
+  // Assuming your auth API supports /me endpoint for user info
+  return this.http.get(`${this.apiUrl}/me`, { withCredentials: true });
+}
+
+updateProfile(profileData: any): Observable<any> {
+  return this.http.put(`${this.apiUrl}/me`, profileData, { withCredentials: true });
+}
+
+updatePassword(passwordData: { currentPassword: string; newPassword: string; confirmPassword: string }): Observable<any> {
+  return this.http.put(`${this.apiUrl}/me/password`, passwordData, { withCredentials: true });
+}
+
+deleteAccount(): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/me`, { withCredentials: true });
+}
 
   /** Load user info from storage on app start */
   loadUserFromStorage(): void {

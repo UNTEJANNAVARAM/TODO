@@ -14,39 +14,28 @@ import { Task } from '../../models/task.model';
   styleUrls: ['./dashboard.css']
 })
 export class DashboardComponent implements OnInit {
-
+  sidebarOpen = false;
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
   selectedTask: Task | null = null;
-
-  currentDate = new Date();
-  showAddTaskForm = false;
-  calendarVisible = false;
-  selectedDate: Date | null = null;
   searchTerm = '';
-  editMode = false;
-  editTaskData: Task = {} as Task;
 
-  // Validation error strings
+  // Form control
+  showAddTaskForm = false;
+  newTask: Partial<Task> = { title: '', description: '', status: false, dueDate: '' };
+  editTaskData: any = {};
+  editMode = false;
   createError = '';
   editError = '';
 
-  completedPercent = 0;
-  ongoingPercent = 0;
-  overduePercent = 0;
+  // Counters
   completedCount = 0;
-  ongoingCount = 0;
+  incompleteCount = 0;
   overdueCount = 0;
+  dueSoonCount = 0;
   streakCount = 0;
 
   user = { displayName: '' };
-  newTask: Partial<Task> = { title: '', description: '', status: false, dueDate: '' };
-
-  weekDays = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-  calendarWeeks: any[] = [];
-  currentMonth = new Date().getMonth();
-  currentYear = new Date().getFullYear();
-  currentMonthName = '';
 
   constructor(
     private taskService: TaskService,
@@ -55,59 +44,116 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-  // Restore the user from storage if available
-  this.authService.loadUserFromStorage();
+    this.authService.loadUserFromStorage();
+    this.user.displayName =
+    this.authService.currentUser?.name ||
+    this.authService.currentUser?.username ||
+    this.authService.currentUser?.displayName ||
+    'User';
 
-  if (this.authService.currentUser) {
-    const u = this.authService.currentUser;
-    this.user.displayName = u.name || u.username || u.displayName || 'User';
-  } else {
-    this.user.displayName = 'User';
+    this.getTasks();
+    this.updateDateTime();
+  setInterval(() => this.updateDateTime(), 1000);
+  }
+  currentDateTime: string = '';
+  updateDateTime() {
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long', // e.g. Monday
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false  // 24-hour time format
+  };
+  this.currentDateTime = now.toLocaleString('en-US', options);
+}
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+  
+  goToProfile() {
+   this.router.navigate(['/dashboard/profile']);
   }
 
-  this.getTasks();
-  this.updateMonthName();
-  this.generateCalendar(this.currentYear, this.currentMonth);
-  setInterval(() => (this.currentDate = new Date()), 1000);
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goToCalendar() {
+    this.router.navigate(['/dashboard/calendar']);
+  }
+
+  getTasks() {
+    this.taskService.getTasks().subscribe(res => {
+      this.tasks = res;
+      this.applySearchFilter();
+      this.calculateTaskSummary();
+      this.calculateStreak();
+    });
+  }
+
+ selectedSortFilter: string = 'all'; // Add this at class level
+
+applySearchFilter() {
+  let tasks = [...this.tasks];
+
+  // 1️⃣ Search term filtering (unchanged)
+  if (this.searchTerm) {
+    const term = this.searchTerm.toLowerCase();
+    tasks = tasks.filter(task =>
+      task.title.toLowerCase().includes(term) ||
+      (task.description && task.description.toLowerCase().includes(term))
+    );
+  }
+
+  // 2️⃣ Sort/Filter dropdown logic
+  switch (this.selectedSortFilter) {
+    case 'completed':
+      tasks = tasks.filter(t => t.status);
+      break;
+    case 'incomplete':
+      tasks = tasks.filter(t => !t.status);
+      break;
+    case 'overdue':
+      tasks = tasks.filter(t => this.isOverdue(t.dueDate, t.status));
+      break;
+    case 'neartoduedate':
+      tasks = tasks.filter(t => !t.status && this.isDueWithinTwoDays(t.dueDate, t.status));
+      break;
+    case 'all':
+    default:
+      // ✅ When showing ALL tasks — sort by color priority:
+      // Red -> Orange -> Blue -> Green
+      
+      tasks.sort((a, b) => {
+        const getPriority = (task: Task) => {
+          if (this.isOverdue(task.dueDate, task.status)) return 1;           // Red
+          if (!task.status && this.isDueWithinTwoDays(task.dueDate, task.status)) return 2; // Orange
+          if (!task.status) return 3;                                        // Blue
+          return 4;                                                          // Green
+        };
+        return getPriority(a) - getPriority(b);
+      });
+      break;
+  }
+
+  // 3️⃣ Save filtered list
+  this.filteredTasks = tasks;
 }
 
 
 
-
-  /* ===== UI Interaction ===== */
   showAddTaskFormToggle() {
     this.showAddTaskForm = !this.showAddTaskForm;
     if (this.showAddTaskForm) {
       this.editMode = false;
       this.selectedTask = null;
       this.createError = '';
+      this.newTask = { title: '', description: '', status: false, dueDate: '' };
     }
-  }
-
-  showTaskDetails(task: Task) {
-    this.selectedTask = task;
-    this.editMode = false;
-    this.showAddTaskForm = false;  // hide add form
-    this.createError = '';
-    this.editError = '';
-  }
-
-  toggleCalendar() {
-    this.calendarVisible = !this.calendarVisible;
-    if (!this.calendarVisible) {
-      this.selectedDate = null;
-      this.filteredTasks = [...this.tasks];
-    }
-  }
-
-  /* ===== CRUD ===== */
-  getTasks() {
-    this.taskService.getTasks().subscribe(res => {
-      this.tasks = res;
-      this.filteredTasks = res;
-      this.calculateTaskSummary();
-      this.calculateStreak();
-    });
   }
 
   createTask() {
@@ -116,27 +162,50 @@ export class DashboardComponent implements OnInit {
       this.createError = 'All fields are required.';
       return;
     }
-    const due = new Date(this.newTask.dueDate);
-    if (due.getTime() < new Date().setHours(0,0,0,0)) {
-      this.createError = 'Due date cannot be earlier than today.';
+    const due = new Date(this.newTask.dueDate as string);
+
+    // Compare directly with the current moment
+    if (due.getTime() <= Date.now()) {
+      this.createError = 'Due date and time must be in the future.';
       return;
     }
 
+
+    const now = new Date().toISOString();
     this.newTask.status = false;
+    this.newTask.createdAt = now;
+    this.newTask.updatedAt = now;
+    this.newTask.completedAt = null; // new tasks start with no completion date
+
     this.taskService.addTask(this.newTask as Task).subscribe(task => {
       this.tasks.push(task);
-      this.filteredTasks = [...this.tasks];
-      this.newTask = { title: '', description: '', status: false, dueDate: '' };
+      this.applySearchFilter();
       this.showAddTaskForm = false;
       this.calculateTaskSummary();
       this.calculateStreak();
     });
   }
 
+  showTaskDetails(task: Task) {
+    this.selectedTask = task;
+    this.editMode = false;
+    this.showAddTaskForm = false;
+  }
+
   startEdit(task: Task) {
     this.editMode = true;
     this.editError = '';
     this.editTaskData = { ...task };
+
+    if (task.dueDate) {
+      const date = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      this.editTaskData.dueDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
   }
 
   saveEdit() {
@@ -145,16 +214,20 @@ export class DashboardComponent implements OnInit {
       this.editError = 'All fields are required.';
       return;
     }
-    const due = new Date(this.editTaskData.dueDate);
-    if (due.getTime() < new Date().setHours(0,0,0,0)) {
-      this.editError = 'Due date cannot be earlier than today.';
+    const due = new Date(this.editTaskData.dueDate as string);
+    const now = new Date();
+
+    // 3. Ensure due date is in the future
+    if (due.getTime() <= now.getTime()) {
+      this.editError = 'Due date and time must be in the future.';
       return;
     }
+    this.editTaskData.updatedAt = new Date().toISOString();
 
     this.taskService.updateTask(this.editTaskData.id!, this.editTaskData).subscribe(updated => {
       const idx = this.tasks.findIndex(t => t.id === updated.id);
       if (idx > -1) this.tasks[idx] = updated;
-      this.filteredTasks = [...this.tasks];
+      this.applySearchFilter();
       this.selectedTask = updated;
       this.editMode = false;
       this.calculateTaskSummary();
@@ -170,146 +243,139 @@ export class DashboardComponent implements OnInit {
   deleteTask(id: number) {
     this.taskService.deleteTask(id).subscribe(() => {
       this.tasks = this.tasks.filter(t => t.id !== id);
-      this.filteredTasks = this.filteredTasks.filter(t => t.id !== id);
-      if (this.selectedTask?.id === id) {
-        this.selectedTask = null;
-        this.editMode = false;
-      }
+      this.applySearchFilter();
+      if (this.selectedTask?.id === id) this.selectedTask = null;
       this.calculateTaskSummary();
       this.calculateStreak();
     });
   }
 
   toggleComplete(task: Task) {
-    const updatedTask = { ...task, status: !task.status };
-    this.taskService.updateTask(task.id!, updatedTask).subscribe(updated => {
-      const idx = this.tasks.findIndex(t => t.id === updated.id);
-      if (idx > -1) this.tasks[idx] = updated;
-      this.filteredTasks = [...this.tasks];
-      this.selectedTask = updated;
-      this.calculateTaskSummary();
-      this.calculateStreak();
-    });
-  }
+  const now = new Date().toISOString();
 
-  /* ===== Calendar & Color Logic ===== */
-  selectDate(dateObj: { fullDate: Date | null }): void {
-    if (!dateObj.fullDate) {
-      this.filteredTasks = [...this.tasks];
-      this.selectedDate = null;
-      return;
+  let streakChange = 0;
+
+  if (!task.status) {
+    // Marking task COMPLETE: calculate streak increase for this task
+    if (task.dueDate) {
+      const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+      const nowDate = new Date();
+
+      const dueMid = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      const nowMid = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+
+      const dayDiff = Math.floor((dueMid.getTime() - nowMid.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (dayDiff > 0) {
+        streakChange = dayDiff;
+      }
     }
-    this.selectedDate = dateObj.fullDate;
-    this.filteredTasks = this.tasks.filter(
-      t => t.dueDate && new Date(t.dueDate).toDateString() === this.selectedDate!.toDateString()
-    );
-  }
+  } else {
+    // Marking task INCOMPLETE: decrease streak based on previous completion streak for this task
 
-  isDueWithinTwoDays(dateStr?: string | Date, done?: boolean): boolean {
-    if (!dateStr || done) return false;
-    const diffDays = Math.ceil(
-      (new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-    );
-    return diffDays <= 2 && diffDays >= 0;
-  }
+    // If you track how many days early the task was completed (e.g. saved on task.completedAt),
+    // recalculate the days early similar to above:
 
-  isOverdue(dateStr?: string | Date, done?: boolean): boolean {
-    if (!dateStr) return false;
-    return !done && new Date(dateStr).getTime() < Date.now();
-  }
+    if (task.completedAt && task.dueDate) {
+      const completedDate = task.completedAt instanceof Date ? task.completedAt : new Date(task.completedAt);
+      const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
 
-  getDateClass(dateObj: any): string {
-    if (!dateObj.fullDate) return '';
-    const dateTasks = this.tasks.filter(
-      t => t.dueDate && new Date(t.dueDate).toDateString() === dateObj.fullDate.toDateString()
-    );
-    if (dateTasks.length === 0) return '';
-    if (dateTasks.every(t => t.status)) return 'calendar-green';
-    if (dateTasks.some(t => !t.status && t.dueDate && new Date(t.dueDate).getTime() < Date.now())) {
-      return 'calendar-red';
+      const dueMid = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      const completedMid = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
+
+      const dayDiff = Math.floor((dueMid.getTime() - completedMid.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Only decrease if completed early
+      if (dayDiff > 0) {
+        streakChange = -dayDiff;
+      }
     }
-    if (dateTasks.some(t => this.isDueWithinTwoDays(t.dueDate, t.status))) {
-      return 'calendar-orange';
-    }
-    return '';
   }
 
-  /* ===== Summary & Streak ===== */
+  const updatedTask: Task = {
+    ...task,
+    status: !task.status,
+    completedAt: !task.status ? now : null,
+    updatedAt: now
+  };
+
+  this.taskService.updateTask(task.id!, updatedTask).subscribe(updated => {
+    // Update task list
+    const idx = this.tasks.findIndex(t => t.id === updated.id);
+    if (idx > -1) this.tasks[idx] = updated;
+
+    this.applySearchFilter();
+    this.selectedTask = updated;
+
+    // Update streak count adding or subtracting streakChange
+    this.streakCount = Math.max(0, this.streakCount + streakChange);
+  });
+}
+
+
   calculateTaskSummary() {
     const total = this.tasks.length || 1;
     this.completedCount = this.tasks.filter(t => t.status).length;
-    this.overdueCount = this.tasks.filter(t => this.isOverdue(t.dueDate, t.status)).length;
-    this.ongoingCount = this.tasks.filter(
-      t => !t.status && !this.isOverdue(t.dueDate, t.status)
+    this.incompleteCount = total - this.completedCount;
+    this.overdueCount = this.tasks.filter(
+      t => this.isOverdue(t.dueDate, t.status)
     ).length;
-    this.completedPercent = Math.round((this.completedCount / total) * 100);
-    this.overduePercent = Math.round((this.overdueCount / total) * 100);
-    this.ongoingPercent = Math.round((this.ongoingCount / total) * 100);
+    this.dueSoonCount = this.tasks.filter(
+      t => !t.status && this.isDueWithinTwoDays(t.dueDate, t.status)
+    ).length;
   }
 
   calculateStreak() {
-    let count = 0;
-    this.tasks.filter(t => t.status && t.dueDate && t.updatedAt).forEach(task => {
-      const due = new Date(task.dueDate as string), done = new Date(task.updatedAt as string);
-      const diff = Math.floor((due.getTime() - done.getTime()) / 86400000);
-      if (diff > 1) count += 2;
-      else if (diff >= 0) count += 1;
-    });
-    this.streakCount = count;
-  }
+  let streak = 0;
 
-  /* ===== Search ===== */
-  applySearchFilter() {
-    const term = this.searchTerm.toLowerCase();
-    this.filteredTasks = this.tasks.filter(
-      t => t.title.toLowerCase().includes(term) ||
-           (t.description ?? '').toLowerCase().includes(term)
-    );
-  }
+  this.tasks.forEach(task => {
+    if (task.status && task.dueDate && task.completedAt) {
+      const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+      const completedDate = task.completedAt instanceof Date ? task.completedAt : new Date(task.completedAt);
 
-  /* ===== Calendar Generation ===== */
-  generateCalendar(year: number, month: number) {
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const weeks: any[] = [];
-    let currentWeek: any[] = new Array(firstDay).fill({ date: '', fullDate: null });
+      // Normalize dates to midnight for day comparison
+      const dueMid = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      const completedMid = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      currentWeek.push({ date: day, fullDate: new Date(year, month, day) });
-      if (currentWeek.length === 7) { weeks.push(currentWeek); currentWeek = []; }
+      const dayDiff = Math.floor((dueMid.getTime() - completedMid.getTime()) / (1000 * 60 * 60 * 24));
+
+      // If completed on dueDate, streak does NOT increase (0)
+      // if completed early, streak increases by number of days early
+      if (dayDiff > 0) {
+        streak += dayDiff; // dayDiff days early
+      }
+      // If completed late or exactly on due date, no increase
     }
+  });
 
-    if (currentWeek.length > 0) {
-      while (currentWeek.length < 7) currentWeek.push({ date: '', fullDate: null });
-      weeks.push(currentWeek);
-    }
-    this.calendarWeeks = weeks;
+  this.streakCount = streak;
+}
+
+
+  isDueWithinTwoDays(dateVal?: string | Date, done?: boolean): boolean {
+  if (!dateVal || done) return false;
+  const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
+
+  // ✅ Exclude overdue tasks
+  if (date.getTime() < Date.now()) return false;
+
+  const diffDays = Math.ceil(
+    (date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  );
+  return diffDays <= 2 && diffDays >= 0; // due today or within 2 days
+}
+
+
+  isOverdue(dateVal?: string | Date, done?: boolean): boolean {
+    if (!dateVal) return false;
+    const date = dateVal instanceof Date ? dateVal : new Date(dateVal);
+    return !done && date.getTime() < Date.now();
   }
 
-  updateMonthName() {
-    this.currentMonthName = new Date(this.currentYear, this.currentMonth)
-      .toLocaleString('default', { month: 'long' });
-  }
-
-  prevMonth() {
-    if (this.currentMonth === 0) { this.currentMonth = 11; this.currentYear--; }
-    else { this.currentMonth--; }
-    this.updateMonthName();
-    this.generateCalendar(this.currentYear, this.currentMonth);
-  }
-
-  nextMonth() {
-    if (this.currentMonth === 11) { this.currentMonth = 0; this.currentYear++; }
-    else { this.currentMonth++; }
-    this.updateMonthName();
-    this.generateCalendar(this.currentYear, this.currentMonth);
-  }
-
-  /* ===== Auth ===== */
   logout() {
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/login']),
-      error: ()  => this.router.navigate(['/login'])
+      error: () => this.router.navigate(['/login'])
     });
   }
 }

@@ -1,0 +1,61 @@
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <button class="header-menu-btn" (click)="toggleSidebar()">☰</button>
+    <div class="header-title">Profile</div>
+  </div>
+  <div class="header-datetime">{{ currentDateTime }}</div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" [class.open]="sidebarOpen">
+  <div class="username">Hi, {{ user?.displayName || 'User' }}</div>
+  <button (click)="goToProfile()">Profile</button>
+  <button (click)="goToDashboard()">Dashboard</button>
+  <button (click)="goToCalendar()">Calendar</button>
+  <div class="sidebar-footer">
+    <button (click)="logout()">Logout</button>
+  </div>
+</div>
+<div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+
+<!-- MAIN PROFILE SECTION -->
+<div class="profile-container">
+  <!-- View Mode -->
+  <div *ngIf="!editMode && !showPasswordForm && user" class="profile-box">
+    <p><strong>User ID:</strong> {{ user.id }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <!--<p><strong>Account Created:</strong> {{ user.createdAt | date:'fullDate' }} {{ user.createdAt | date:'HH:mm' }}</p>
+    <p><strong>Account Updated:</strong> {{ user.updatedAt | date:'fullDate' }} {{ user.updatedAt | date:'HH:mm' }}</p>-->
+
+    <div class="form-actions">
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="startEdit()">Update Account</button>
+      <button class="dashboard-btn-base dashboard-btn-orange" (click)="startPasswordUpdate()">Update Password</button>
+      <button class="dashboard-btn-base dashboard-btn-red" (click)="deleteAccount()">Delete Account</button>
+    </div>
+  </div>
+
+  <!-- Edit Account Form -->
+  <div *ngIf="editMode" class="edit-form">
+    <input type="text" [(ngModel)]="editData.username" placeholder="Username" />
+    <input type="email" [(ngModel)]="editData.email" placeholder="Email" />
+    <div class="form-actions">
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="saveEdit()">Save</button>
+      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelEdit()">Cancel</button>
+    </div>
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </div>
+
+  <!-- Update Password Form -->
+  <div *ngIf="showPasswordForm" class="edit-form">
+    <input type="password" [(ngModel)]="passwordData.currentPassword" placeholder="Current Password" />
+    <input type="password" [(ngModel)]="passwordData.newPassword" placeholder="New Password" />
+    <input type="password" [(ngModel)]="passwordData.confirmPassword" placeholder="Confirm Password" />
+    <div class="form-actions">
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="updatePassword()">Save</button>
+      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelPasswordUpdate()">Cancel</button>
+    </div>
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </div>
+</div>

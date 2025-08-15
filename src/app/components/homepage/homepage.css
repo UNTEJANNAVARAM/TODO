@@ -1,13 +1,13 @@
 :host {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* so footer can stick */
-  background: linear-gradient(135deg, #f8fafc 80%, #e6ecfa 100%);
+  min-height: 100vh;
+  background: #fdfdfd; /* Matches dashboard main bg */
   font-family: 'Segoe UI', Arial, sans-serif;
   color: #333;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -15,72 +15,71 @@
   background: #fff;
   border-bottom: 1px solid #e7eaf3;
   padding: 1rem 2.8rem;
-  box-shadow: 0 2px 8px #e7eaf392;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .logo {
   font-size: 2rem;
   font-weight: 700;
-  color: #3967ff;
+  color: #0d47a1; /* Primary dashboard blue */
   letter-spacing: 1px;
 }
 
-/* Buttons in header */
 .button-group {
   display: flex;
   gap: 1.2rem;
 }
+
 .button-group button {
-  background-color: #3967ff;
+  background-color: #0d47a1;
   color: white;
   border: none;
   padding: 0.52rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 7px;
+  font-size: 0.95rem;
+  border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 10px #d7e3ff40;
+  box-shadow: 0 2px 8px rgba(13,71,161,0.25);
   transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 .button-group button:hover {
-  background: #6789ee;
-  box-shadow: 0 6px 20px #c8dfff80;
+  background: #1565c0;
+  box-shadow: 0 4px 12px rgba(21,101,192,0.35);
   transform: translateY(-2px);
 }
 .button-group button:active {
-  transform: scale(0.95); /* click animation */
+  transform: scale(0.96);
 }
 
-/* BODY CONTENT */
+/* ===== BODY CONTENT ===== */
 .body-content {
-  flex: 1; /* take remaining height for footer push-down */
+  flex: 1;
   max-width: 900px;
   margin: 0 auto;
   padding: 2.5rem 1.4rem;
 }
 
+/* Intro text */
 .intro {
   text-align: center;
   margin-bottom: 2.3rem;
 }
 .intro h1 {
-  font-size: 2.8rem;
+  font-size: 2.3rem;
   font-weight: 800;
-  color: #2657c2;
-  margin-bottom: 1.2rem;
-  letter-spacing: 1px;
-  animation: fadeInDown 0.8s ease;
+  color: #0d47a1;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
 }
 .intro p {
-  font-size: 1.18rem;
+  font-size: 1.05rem;
   color: #444;
   max-width: 640px;
   margin: 0 auto;
   line-height: 1.5;
-  animation: fadeInUp 0.9s ease;
 }
 
-/* TODO App themed info cards */
+/* Info cards matching dashboard box style */
 .info-box-group {
   display: flex;
   justify-content: center;
@@ -89,20 +88,20 @@
 }
 .info-box {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 1.5rem;
   width: 250px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
-  border-top: 4px solid #3967ff;
+  border-top: 4px solid #0d47a1;
 }
 .info-box:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 .info-box h3 {
-  color: #3967ff;
+  color: #0d47a1;
   margin-bottom: 0.5rem;
 }
 .info-box p {
@@ -110,36 +109,12 @@
   font-size: 0.95rem;
 }
 
-/* FOOTER fixed to bottom */
+/* ===== FOOTER ===== */
 .footer {
-  background: linear-gradient(90deg, #324e85 66%, #506da2 100%);
-  color: #ebf2fc;
-  border-top: 1px solid #457bd9;
-  font-size: 1.07rem;
-  box-shadow: 0 -2px 18px #324e8555;
-  letter-spacing: 0.05em;
+  background: #0d47a1;
+  color: #fff;
+  font-size: 0.95rem;
   padding: 1.2rem;
-  margin-top: auto; /* pushes footer to bottom */
+  margin-top: auto;
   text-align: center;
-}
-
-/* Animations */
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 700px) {
-  .info-box-group {
-    flex-direction: column;
-    align-items: center;
-  }
-  .info-box {
-    width: 90%;
-  }
-  .intro h1 { font-size: 2rem; }
 }

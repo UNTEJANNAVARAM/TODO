@@ -3,11 +3,13 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 80%, #e6ecfa 100%);
+  background: #fdfdfd; /* matches dashboard main bg */
   font-family: 'Segoe UI', Arial, sans-serif;
   position: relative;
+  color: #333;
 }
 
+/* Back button (top-right) */
 .back-btn-container {
   position: absolute;
   top: 30px;
@@ -16,145 +18,136 @@
 }
 .back-btn {
   background: #f3f7ff;
-  color: #3967ff;
+  color: #0d47a1;
   border: 1.5px solid #a5bfef;
   border-radius: 25px;
   padding: 0.42rem 1.3rem;
-  font-size: 1.03rem;
+  font-size: 0.95rem;
   font-weight: 500;
-  box-shadow: 0 1px 4px #d6e2ff39;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   cursor: pointer;
   transition: background 0.17s, color 0.17s, border 0.18s;
 }
-.back-btn:hover,
-.back-btn:focus-visible {
-  background: #3967ff;
+.back-btn:hover {
+  background: #0d47a1;
   color: #fff;
-  border-color: #3967ff;
+  border-color: #0d47a1;
 }
 
-/* Card container for registration form */
+/* Main registration card container */
 .register-container {
   background: #fff;
   padding: 2rem 2rem 1.2rem 2rem;
-  border-radius: 20px;
-  box-shadow: 0 4px 32px #d7eaf360;
-  min-width: 320px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   width: 100%;
   max-width: 390px;
+  border: 1px solid #ddd;
 }
 
 /* Heading */
-h2 {
+.register-container h2 {
   text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #3967ff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #0d47a1; /* dashboard primary */
   margin-bottom: 1.1rem;
 }
 
+/* Form layout */
 form {
   display: grid;
   gap: 0.85rem;
 }
 
-input,
-button[type="submit"] {
+/* Inputs */
+.register-container input {
   width: 100%;
-  box-sizing: border-box;
-  padding: 0.7rem 1rem;
-  font-size: 1rem;
-  border-radius: 7px;
-}
-
-input {
-  border: 1px solid #e7eaf3;
-  background: #ecf2ff;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
   color: #333;
-  transition: border-color 0.2s;
-  margin-bottom: 0;
+  box-sizing: border-box;
 }
-
-input:focus {
-  border-color: #3967ff;
+.register-container input:focus {
+  border-color: #0d47a1;
   outline: none;
 }
 
-button[type="submit"] {
-  background: #3967ff;
-  color: white;
+/* Submit Button */
+.register-container button[type="submit"] {
+  background: #0d47a1;
+  color: #fff;
   border: none;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 8px #d7eaf340;
-  margin-top: 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 8px rgba(13, 71, 161, 0.25);
+  transition: background 0.2s ease;
 }
-button[type="submit"]:hover,
-button[type="submit"]:focus-visible {
-  background: #6789ee;
+.register-container button[type="submit"]:hover {
+  background: #1565c0;
 }
 
+/* Error + Success Messages */
 .error {
-  color: #d63031;
-  background: #fae3e5;
-  border: 1px solid #ff7675;
-  padding: 0.7rem 1rem;
-  border-radius: 7px;
-  margin: 0.8rem 0;
+  background: #fdecea;
+  border: 1px solid #f5c2c7;
+  color: #b71c1c;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
   text-align: center;
-  font-weight: 500;
 }
-
 .success {
   background: #37d67a;
   color: #fff;
-  padding: 0.7rem 1rem;
-  border-radius: 7px;
-  margin: 0.8rem 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
   text-align: center;
-  font-weight: 500;
 }
 
+/* Login link section */
 .login-link {
-  margin-top: 1.5rem;
+  margin-top: 1.3rem;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #333;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  align-items: center;
+  display: block;
 }
 
-.login-link button {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.7rem 1rem;
-  background: #32a8ff;
-  color: #fff;
-  border-radius: 7px;
-  border: none;
-  font-size: 1rem;
+.login-link span {
+  display: inline;
+  margin-right: 0.3em;
+}
+
+.login-link-anchor {
+  color: #1976d2; /* Blue link color */
+  text-decoration: underline;
   cursor: pointer;
   font-weight: 500;
-  transition: background 0.2s;
-  margin-top: 0.2rem;
-}
-.login-link button:hover,
-.login-link button:focus-visible {
-  background: #4460b5;
 }
 
-/* Responsive for mobile */
+.login-link-anchor:hover {
+  color: #0d47a1; /* Darker blue on hover */
+  text-decoration: none;
+}
+
+
+/* Mobile-friendly */
 @media (max-width: 500px) {
   .register-container {
-    padding: 1.3rem 0.3rem;
-    min-width: 0;
+    padding: 1.3rem 0.8rem;
     max-width: 97vw;
-    border-radius: 13px;
+    border-radius: 8px;
   }
-  h2 { font-size: 1.25rem; }
   .back-btn-container {
     top: 10px;
     right: 8px;

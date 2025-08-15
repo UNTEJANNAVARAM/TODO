@@ -32,7 +32,7 @@ export class LoginComponent {
     } else if (err.status === 401) {
       this.errorMessage = 'Invalid credentials.';
     } else if (err.status === 404) {
-      this.errorMessage = 'User not found.';
+      this.errorMessage = 'User not found.Check mail id';
     } else {
       this.errorMessage = (err.error && err.error.message) ? err.error.message : 'Login failed.';
     }
@@ -47,7 +47,5 @@ export class LoginComponent {
   goToHome() {
     this.router.navigate(['/']);
   }
-  goToRegister() {
-    this.router.navigate(['/register']);
-  }
+ 
 }

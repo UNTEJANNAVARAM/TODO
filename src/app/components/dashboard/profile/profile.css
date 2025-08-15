@@ -1,0 +1,256 @@
+/* === GLOBAL FONT === */
+.profile-container,
+.profile-container * {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* === HEADER === */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* left group on left, date/time on right */
+  height: 60px;
+  padding: 0 1rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-menu-btn {
+  background: none;
+  border: none;
+  color: #0d47a1;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.header-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0d47a1;
+  white-space: nowrap;
+}
+
+.header-datetime {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0d47a1;
+  white-space: nowrap;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  position: fixed;
+  top: 60px; /* below header */
+  left: 0;
+  height: calc(100vh - 60px);
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.username {
+  display: flex; /* enable centering with flexbox */
+  height: 60px; /* fixed height */
+  font-weight: bold;
+  font-size: 2rem;
+  color: #0d47a1;
+  border-bottom: 1px solid #eee;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  padding: 0.75rem 1.2rem;
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.75rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0d47a1;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar button:hover {
+  background-color: #e3f2fd;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem 1.2rem;
+  border-top: 1px solid #eee;
+}
+
+.sidebar-footer button {
+  width: 100%;
+  font-weight: 600;
+  color: #e53935;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.sidebar-footer button:hover {
+  color: #b71c1c;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 60px);
+  background: rgba(0,0,0,0.3);
+  z-index: 900;
+}
+
+/* === PROFILE CONTENT === */
+.profile-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  padding-left: 20px; /* space for sidebar */
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.profile-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.profile-box p {
+  margin-bottom: 0.5rem;
+}
+
+/* BUTTONS (reuse dashboard styles) */
+.dashboard-btn-base {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  height: auto;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+
+.dashboard-btn-blue {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.dashboard-btn-green {
+  background: #e0f2e9;
+  color: #2e7d32;
+}
+
+.dashboard-btn-red {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.dashboard-btn-grey {
+  background: #eeeeee;
+  color: #424242;
+}
+
+.dashboard-btn-orange {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.dashboard-btn-blue:hover {
+  background: #bbdefb;
+}
+
+.dashboard-btn-red:hover {
+  background: #f8d7da;
+}
+
+.dashboard-btn-grey:hover {
+  background: #e0e0e0;
+}
+
+.dashboard-btn-orange:hover {
+  background: #ffe0b2;
+}
+
+/* FORM STYLES */
+.edit-form {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 1rem;
+}
+
+.edit-form input {
+  margin-bottom: 0.5rem;
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.edit-form input:focus {
+  border-color: #3967ff;
+}
+
+/* BUTTON SPACING */
+.form-actions {
+  margin-top: 1rem;
+  gap: 0.5rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ERROR MESSAGE */
+.error-message {
+  background: #fdecea; /* light red bg */
+  border: 1px solid #f5c2c7; /* red border */
+  color: #b71c1c; /* dark red text */
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}

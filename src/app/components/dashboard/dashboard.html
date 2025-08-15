@@ -1,134 +1,142 @@
-<div class="dashboard-layout4">
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="profile-card">
-      <h3>Wlcome back, {{user.displayName}}</h3>
-    </div>
-
-    <button class="calendar-toggle-btn" (click)="toggleCalendar()">
-      {{ calendarVisible ? 'Hide Calendar' : 'Show Calendar' }}
-    </button>
-
-    <div *ngIf="calendarVisible" class="calendar-container">
-      <div class="calendar-nav">
-        <button (click)="prevMonth()">&laquo; Prev</button>
-        <span>{{ currentMonthName }} {{ currentYear }}</span>
-        <button (click)="nextMonth()">Next &raquo;</button>
-      </div>
-      <table class="calendar">
-        <thead>
-          <tr><th *ngFor="let day of weekDays">{{ day }}</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let week of calendarWeeks">
-            <td *ngFor="let dateObj of week"
-                [ngClass]="getDateClass(dateObj)"
-                (click)="selectDate(dateObj)">
-              {{ dateObj.date }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <button class="logout-btn" (click)="logout()">Logout</button>
+<!-- ===== HEADER ===== -->
+<div class="app-header">
+  <div class="header-left">
+    <button class="header-menu-btn" (click)="toggleSidebar()">☰</button>
+    <div class="header-title">Dashboard</div>
   </div>
+  <div class="header-datetime">{{ currentDateTime }}</div>
+</div>
 
-  <!-- MAINLEFT -->
-  <div class="mainleft">
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar" [class.open]="sidebarOpen">
+  <div class="username">Hi, {{ user.displayName }}</div>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToProfile()">Profile</button>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToCalendar()">Calendar</button>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToDashboard()">Dashboard</button>
+  
+  <div class="sidebar-footer">
+    <button class="dashboard-btn-base dashboard-btn-red" (click)="logout()">Logout</button>
+  </div>
+</div>
+<div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="dashboard-container">
+
+  <!-- LEFT PANE -->
+<div class="dashboard-left">
+  
+  <!-- Sticky Sort + Search -->
+  <div class="task-filters">
+    <!-- Sort Dropdown -->
+    <select [(ngModel)]="selectedSortFilter"
+            (change)="applySearchFilter()"
+            class="sort-select">
+      <option value="all">All</option>
+      <option value="completed">Completed</option>
+      <option value="incomplete">Incomplete</option>
+      <option value="overdue">Out of Due Date</option>
+      <option value="neartoduedate">Near to Due Date</option>
+    </select>
+
+    <!-- Search Bar -->
     <input type="text"
-           [(ngModel)]="searchTerm"
            class="search-bar"
            placeholder="Search tasks..."
+           [(ngModel)]="searchTerm"
            (input)="applySearchFilter()" />
+  </div>
 
-    <div *ngFor="let task of filteredTasks"
-         class="task-card"
+  <!-- Tasks List -->
+  <div class="tasks-list">
+    <div class="task-card"
+         *ngFor="let task of filteredTasks"
+         (click)="showTaskDetails(task)"
          [ngClass]="{
            'green-top': task.status,
+           'red-top': isOverdue(task.dueDate, task.status),
            'orange-top': isDueWithinTwoDays(task.dueDate, task.status),
-           'red-top': isOverdue(task.dueDate, task.status)
-         }"
-         (click)="showTaskDetails(task)">
-      <div class="task-header">
-        <div class="task-title">{{ task.title }}</div>
-        <div class="task-status">{{ task.status ? '✅ Done' : '⏳ Pending' }}</div>
-        <div class="task-duedate">Due: {{ task.dueDate | date:'mediumDate' }}</div>
+           'blue-top': !task.status && !isDueWithinTwoDays(task.dueDate, task.status) && !isOverdue(task.dueDate, task.status)
+         }">
+      <div class="task-title">{{ task.title }}</div>
+      <div class="task-status">{{ task.status ? 'Completed' : 'Incomplete' }}</div>
+      <div class="task-date">
+        {{ task.dueDate | date: 'mediumDate' }} {{ task.dueDate | date: 'HH:mm' }}
       </div>
     </div>
   </div>
 
-  <!-- MAINRIGHT -->
-  <div class="mainright">
+</div>
 
-    <!-- Add Task Button -->
-    <button class="add-task-btn main-btn" (click)="showAddTaskFormToggle()">
-      + Add Task
-    </button>
 
-    <!-- Add Task Form -->
-    <div *ngIf="showAddTaskForm" class="add-task-form">
-      <div *ngIf="createError" class="error-msg">{{ createError }}</div>
-      <input type="text" [(ngModel)]="newTask.title" placeholder="Title" />
-      <textarea [(ngModel)]="newTask.description" placeholder="Description"></textarea>
-      <input type="date" [(ngModel)]="newTask.dueDate" />
-      <button class="main-btn" (click)="createTask()">Create</button>
+  <!-- CENTER PANE -->
+  <div class="dashboard-center">
+    <!-- CREATE TASK -->
+    <div class="create-task-center">
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="showAddTaskFormToggle()">
+        + Create Task
+      </button>
+
+      <div *ngIf="showAddTaskForm" class="login-form-style create-task-form">
+        <input type="text" [(ngModel)]="newTask.title" placeholder="Task Title" />
+        <textarea [(ngModel)]="newTask.description" placeholder="Task Description"></textarea>
+        <input type="datetime-local" [(ngModel)]="newTask.dueDate" />
+        <button class="dashboard-btn-base dashboard-btn-blue" (click)="createTask()">Create</button>
+        <div class="error-message" *ngIf="createError">{{ createError }}</div>
+      </div>
     </div>
 
-    <!-- Task Details -->
-    <div *ngIf="selectedTask && !showAddTaskForm" class="task-details-pane">
-      <h2 class="detail-title">{{ selectedTask.title }}</h2>
-
-      <div class="dates-status-row">
-        <div><strong>Status:</strong> {{ selectedTask.status ? 'Completed' : 'Pending' }}</div>
-        <div><strong>Created:</strong> {{ selectedTask.createdAt | date:'short' }}</div>
-        <div><strong>Updated:</strong> {{ selectedTask.updatedAt | date:'short' }}</div>
-        <div><strong>Due:</strong> {{ selectedTask.dueDate | date:'mediumDate' }}</div>
-      </div>
-
-      <div class="task-description">
-        <strong>Description:</strong>
-        <p>{{ selectedTask.description }}</p>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="action-buttons" *ngIf="!editMode">
-        <button class="main-btn" (click)="startEdit(selectedTask)">Edit</button>
-        <button class="delete-btn" (click)="deleteTask(selectedTask.id!)">Delete</button>
-        <button class="complete-btn" (click)="toggleComplete(selectedTask)">
-          {{ selectedTask.status ? 'Mark Uncomplete' : 'Mark Complete' }}
+    <!-- TASK DETAILS -->
+    <div *ngIf="selectedTask && !editMode && !showAddTaskForm" class="task-details-pane">
+      <h2>{{ selectedTask.title }}</h2>
+      <p>{{ selectedTask.description }}</p>
+      <p><strong>Created:</strong> {{ selectedTask.createdAt | date: 'fullDate' }} {{ selectedTask.createdAt | date: 'HH:mm' }}</p>
+      <p><strong>Updated:</strong> {{ selectedTask.updatedAt | date: 'fullDate' }} {{ selectedTask.updatedAt | date: 'HH:mm' }}</p>
+      <p><strong>Due Date:</strong> {{ selectedTask.dueDate | date: 'fullDate' }} {{ selectedTask.dueDate | date: 'HH:mm' }}</p>
+      <p><strong>Status:</strong> {{ selectedTask.status ? 'Completed' : 'Incomplete' }}</p>
+      <p *ngIf="selectedTask.status && selectedTask.completedAt">
+        <strong>Completed On:</strong> {{ selectedTask.completedAt | date: 'fullDate' }} {{ selectedTask.completedAt | date: 'HH:mm' }}
+      </p>
+      <div class="action-buttons">
+        <button class="dashboard-btn-base dashboard-btn-blue" (click)="startEdit(selectedTask)">Edit</button>
+        <button class="dashboard-btn-base dashboard-btn-red" (click)="deleteTask(selectedTask.id!)">Delete</button>
+        <button class="dashboard-btn-base dashboard-btn-green" (click)="toggleComplete(selectedTask)">
+          {{ selectedTask.status ? 'Mark Incomplete' : 'Mark Complete' }}
         </button>
       </div>
+    </div>
 
-      <!-- Edit Form -->
-      <div *ngIf="editMode" class="edit-form">
-        <div *ngIf="editError" class="error-msg">{{ editError }}</div>
-        <input type="text" [(ngModel)]="editTaskData.title" placeholder="Title" />
-        <textarea [(ngModel)]="editTaskData.description" placeholder="Description"></textarea>
-        <input type="date" [(ngModel)]="editTaskData.dueDate" />
-        <div class="form-actions">
-          <button class="main-btn" (click)="saveEdit()">Save</button>
-          <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
-        </div>
+    <!-- EDIT FORM -->
+    <div *ngIf="editMode" class="edit-form">
+      <h2>Edit Task</h2>
+      <input type="text" [(ngModel)]="editTaskData.title" placeholder="Task Title" />
+      <textarea [(ngModel)]="editTaskData.description" placeholder="Task Description"></textarea>
+      <input type="datetime-local" [(ngModel)]="editTaskData.dueDate" />
+      <div class="form-actions">
+        <button class="dashboard-btn-base dashboard-btn-blue" (click)="saveEdit()">Save</button>
+        <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelEdit()">Cancel</button>
       </div>
+      <div class="error-message" *ngIf="editError">{{ editError }}</div>
     </div>
   </div>
 
-  <!-- SUMMARY -->
-  <div class="summarybox">
-    <div class="current-datetime">
-      {{ currentDate | date:'EEEE, MMMM d, y - hh:mm a' }}
-    </div>
-    <div class="task-summary-box white-bg">
+  <!-- RIGHT PANE -->
+  <div class="dashboard-right">
+    <div class="summary-box">
       <h3>Task Summary</h3>
-      <div class="summary-line green-line">Completed: {{ completedPercent }}% ({{ completedCount }} tasks)</div>
-      <div class="summary-line orange-line">Ongoing: {{ ongoingPercent }}% ({{ ongoingCount }} tasks)</div>
-      <div class="summary-line red-line">Out of Date: {{ overduePercent }}% ({{ overdueCount }} tasks)</div>
+      <div class="summary-line total-line">Total Tasks: {{ tasks.length }}</div>
+      <div class="summary-line green-line">Completed: {{ completedCount }}</div>
+      <div class="summary-line blue-line">Incomplete: {{ incompleteCount }}</div>
+      <div class="summary-line red-line">Out of Due Date: {{ overdueCount }}</div>
+      <div class="summary-line orange-line">Near to Due Date: {{ dueSoonCount }}</div>
     </div>
+
     <div class="streak-box">
-      <h4>Streak</h4>
-      <div class="streak-star">&#11088;<span class="streak-number"><b>{{ streakCount }}</b></span></div>
+      <div class="star-icon">★</div>
+      <div>
+        <div class="streak-number">{{ streakCount }}</div>
+        <div class="streak-label">Streak Points</div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,127 @@
+<!-- ===== HEADER ===== -->
+<div class="app-header">
+  <div class="header-left">
+    <button class="header-menu-btn" (click)="toggleSidebar()">☰</button>
+    <div class="header-title">Calendar</div>
+  </div>
+  <div class="header-datetime">{{ currentDateTime }}</div>
+</div>
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar" [class.open]="sidebarOpen">
+  <div class="username">Hi, {{ user.displayName }}</div>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToProfile()">Profile</button>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToCalendar()">Calendar</button>
+  <button class="dashboard-btn-base dashboard-btn-blue" (click)="goToDashboard()">Dashboard</button>
+  
+  <div class="sidebar-footer">
+    <button class="dashboard-btn-base dashboard-btn-red" (click)="logout()">Logout</button>
+  </div>
+</div>
+<div class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="toggleSidebar()"></div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="calendar-page-container">
+  <div class="calendar-main">
+  
+
+
+    <!-- LEFT PANE: Calendar -->
+    <div class="calendar-left">
+        <!-- Date Field Selector -->
+<div class="calendar-date-filter">
+  <label for="dateFieldSelect">Select Calendar</label>
+  <select id="dateFieldSelect"
+          [(ngModel)]="selectedDateField"
+          (change)="onDateFieldChange()">
+    <option value="dueDate">Show Calendar based on Task Due Date</option>
+    <option value="createdAt">Show Calendar based on Task Created Date</option>
+    <option value="updatedAt">Show Calendar based on Task Updated Date</option>
+  </select>
+</div>
+      <div class="calendar-header">
+        <button (click)="prevMonth()">&lt;</button>
+        <span>{{ currentMonthName }} {{ currentYear }}</span>
+        <button (click)="nextMonth()">&gt;</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div *ngFor="let day of weekDays">{{ day }}</div>
+      </div>
+      <div *ngFor="let week of calendarWeeks" class="calendar-week-row">
+        <div *ngFor="let day of week"
+             class="calendar-day"
+             [ngClass]="getDayColorClass(day)"
+             (click)="onSelectDate(day)">
+          {{ day.date }}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANE: Tasks for Selected Date -->
+    <div class="calendar-right">
+  <h3 *ngIf="selectedDate">Tasks for {{ selectedDate | date:'fullDate' }}</h3>
+
+  <div *ngFor="let task of tasksForSelectedDate"
+     class="task-card"
+     [ngClass]="getTaskColorClass(task)">
+
+  <!-- Title -->
+  <div class="task-title">{{ task.title }}</div>
+
+  <!-- Description -->
+  <div class="task-desc" *ngIf="task.description">
+    {{ task.description }}
+  </div>
+
+  <!-- Status -->
+  <div class="task-status">
+    {{ task.status ? 'Completed' : 'Incomplete' }}
+  </div>
+
+  <!-- Created Date -->
+  <div class="task-date">
+    <strong>Created Date:</strong>
+    {{ task.createdAt | date:'mediumDate' }} {{ task.createdAt | date:'HH:mm' }}
+  </div>
+
+  <!-- Updated Date -->
+  <div class="task-date">
+    <strong>Updated Date:</strong>
+    {{ task.updatedAt | date:'mediumDate' }} {{ task.updatedAt | date:'HH:mm' }}
+  </div>
+
+  <!-- Due Date -->
+  <div class="task-date">
+    <strong>Due Date:</strong>
+    {{ task.dueDate | date:'mediumDate' }} {{ task.dueDate | date:'HH:mm' }}
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="task-actions">
+    <button class="dashboard-btn-base dashboard-btn-blue" (click)="startEdit(task)">Edit</button>
+    <button class="dashboard-btn-base dashboard-btn-red" (click)="deleteTask(task.id!)">Delete</button>
+    <button class="dashboard-btn-base dashboard-btn-green" (click)="toggleComplete(task)">
+      {{ task.status ? 'Mark Incomplete' : 'Mark Complete' }}
+    </button>
+  </div>
+
+  <!-- Optional: Edit Form If Editing This Task -->
+  <div *ngIf="editMode && editingTask && editingTask.id === task.id" class="edit-form">
+    <input type="text" [(ngModel)]="editingTask.title" placeholder="Task Title" />
+    <textarea [(ngModel)]="editingTask.description" placeholder="Task Description"></textarea>
+    <input type="datetime-local" [(ngModel)]="editingTask.dueDate" />
+    <div class="error-message" *ngIf="editError">{{ editError }}</div>
+    <div class="form-actions">
+      <button class="dashboard-btn-base dashboard-btn-blue" (click)="saveEdit()">Save</button>
+      <button class="dashboard-btn-base dashboard-btn-grey" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+
+
+  </div>
+</div>

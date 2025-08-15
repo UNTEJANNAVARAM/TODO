@@ -1,12 +1,12 @@
 export interface Task {
   id?: number;
   title: string;
-  description?: string;
-  status?: boolean; // <-- now boolean
-  dueDate?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  userId?: number;
+  description: string;
+  dueDate?: string | Date;
+  status: boolean;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  completedAt?: string | Date | null;  // Add this property to fix the errors
 }
 
 
