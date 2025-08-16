@@ -354,30 +354,13 @@ showPopup(message: string) {
     ).length;
   }
 
-  calculateStreak() {
-  let streak = 0;
+calculateStreak() {
+  // In this logic, streak is the count of tasks marked as completed
+  // You can change this to other logic if needed
+  const completedTasksCount = this.tasks.filter(task => task.status).length;
 
-  this.tasks.forEach(task => {
-    if (task.status && task.dueDate && task.completedAt) {
-      const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-      const completedDate = task.completedAt instanceof Date ? task.completedAt : new Date(task.completedAt);
-
-      // Normalize dates to midnight for day comparison
-      const dueMid = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
-      const completedMid = new Date(completedDate.getFullYear(), completedDate.getMonth(), completedDate.getDate());
-
-      const dayDiff = Math.floor((dueMid.getTime() - completedMid.getTime()) / (1000 * 60 * 60 * 24));
-
-      // If completed on dueDate, streak does NOT increase (0)
-      // if completed early, streak increases by number of days early
-      if (dayDiff > 0) {
-        streak += dayDiff; // dayDiff days early
-      }
-      // If completed late or exactly on due date, no increase
-    }
-  });
-
-  this.streakCount = streak;
+  // Or if you want streak to be capped or an absolute count, just assign:
+  this.streakCount = completedTasksCount;
 }
 
 
